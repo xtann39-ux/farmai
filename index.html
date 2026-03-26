@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ฟาร์มงอกเงย - ระบบสั่งถั่วงอก</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Sarabun -->
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Leaflet CSS (สำหรับแผนที่) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+
+    <style>
+        body { 
+            font-family: 'Sarabun', sans-serif; 
+            background-color: #f8fafc;
+        }
+        
+        .tab-content { 
+            display: none; 
+            animation: fadeScale 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .tab-content.active { 
+            display: block; 
+        }
+
+        @keyframes fadeScale {
+            from { opacity: 0; transform: translateY(10px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        input[type="radio"] {
+            display: none;
+        }
+
+        .leaflet-container {
+            z-index: 10;
+        }
+    </style>
+</head>
+<body class="text-gray-800 antialiased pb-20">
+
+    <div class="max-w-4xl mx-auto p-3 md:p-6 mt-2 md:mt-8">
+        
+        <!-- ส่วนหัว (Header) -->
+        <header class="text-center mb-6 bg-white p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 flex flex-col items-center">
+            <!-- โลโก้แบรนด์ -->
+            <div class="w-24 h-24 mb-3 flex items-center justify-center">
+                <img src="brand.jfif" alt="โลโก้ฟาร์มงอกเงย" class="max-w-full max-h-full object-contain" onerror="this.onerror=null; this.src='https://placehold.co/200x200/1e3a8a/ffffff?text=Logo';">
+            </div>
+            <h1 class="text-3xl font-bold text-blue-800 tracking-tight">ฟาร์มงอกเงย</h1>
+            <p class="text-gray-500 mt-1 text-sm font-medium">สั่งซื้อถั่วงอกสดใหม่ ส่งตรงถึงหน้าบ้าน</p>
+        </header>
+
+        <!-- แถบเมนู (Tabs) -->
+        <div class="bg-white rounded-t-3xl shadow-[0_-4px_20px_rgb(0,0,0,0.02)] border-b border-gray-100 px-4 pt-4 flex gap-2 overflow-x-auto">
+            <button class="flex-1 min-w-[100px] py-4 px-2 border-b-4 tab-btn active border-blue-600 text-blue-700 font-semibold transition-all rounded-t-xl hover:bg-blue-50" 
+                    id="order-tab" type="button" onclick="openTab(event, 'order-page')">
+                <div class="flex flex-col items-center gap-1">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                    <span class="text-sm md:text-base whitespace-nowrap">สั่งซื้อสินค้า</span>
+                </div>
+            </button>
+            <button class="flex-1 min-w-[100px] py-4 px-2 border-b-4 border-transparent text-gray-400 font-semibold transition-all rounded-t-xl hover:bg-gray-50 hover:text-gray-600" 
+                    id="track-tab" type="button" onclick="openTab(event, 'track-page')">
+                <div class="flex flex-col items-center gap-1">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
+                    <span class="text-sm md:text-base whitespace-nowrap">ติดตามสถานะ</span>
+                </div>
+            </button>
+            <button class="flex-1 min-w-[100px] py-4 px-2 border-b-4 border-transparent text-gray-400 font-semibold transition-all rounded-t-xl hover:bg-gray-50 hover:text-gray-600" 
+                    id="admin-tab" type="button" onclick="openTab(event, 'admin-page')">
+                <div class="flex flex-col items-center gap-1">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                    <span class="text-sm md:text-base whitespace-nowrap">ระบบหลังบ้าน</span>
+                </div>
+            </button>
+        </div>
+
+        <!-- เนื้อหา (Content Area) -->
+        <div class="bg-white rounded-b-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] mb-8 overflow-hidden">
+            
+            <!-- ========================================== -->
+            <!-- 🛒 หน้าสั่งออเดอร์ (Customer Page) -->
+            <!-- ========================================== -->
+            <div class="tab-content active p-5 md:p-8" id="order-page">
+                
+                <form id="orderForm" onsubmit="handleOrderSubmit(event)" class="space-y-8">
+                    
+                    <!-- ส่วนที่ 1: ข้อมูลผู้สั่ง -->
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-2 mb-4">
+                            <span class="bg-blue-100 text-blue-700 w-8 h-8 rounded-full flex items-center justify-center font-bold">1</span>
+                            <h2 class="text-xl font-semibold text-gray-800">ข้อมูลผู้สั่ง</h2>
+                        </div>
+                        <input type="text" name="customerName" required placeholder="ชื่อ-นามสกุล หรือ ชื่อร้านค้า" 
+                               class="w-full p-4 border border-gray-200 rounded-2xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-lg placeholder-gray-400 shadow-sm">
+                    </div>
+
+                    <!-- ส่วนที่ 2: เลือกขนาดบรรจุ (รูปสินค้าจริง) -->
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-2 mb-4">
+                            <span class="bg-blue-100 text-blue-700 w-8 h-8 rounded-full flex items-center justify-center font-bold">2</span>
+                            <h2 class="text-xl font-semibold text-gray-800">เลือกขนาดบรรจุภัณฑ์</h2>
+                        </div>
+                        
+                        <div class="grid grid-cols-3 gap-3 md:gap-4">
+                            <!-- ขนาด 1 กก. -->
+                            <label class="cursor-pointer relative group">
+                                <input type="radio" name="sproutSize" value="1" class="peer" required onchange="calculateTotal()">
+                                <div class="h-full border-2 border-gray-100 rounded-2xl p-4 flex flex-col items-center justify-end gap-3 transition-all peer-checked:border-blue-600 peer-checked:bg-blue-50 peer-checked:shadow-md hover:border-blue-200 hover:bg-blue-50/50">
+                                    <img src="product.jpg" alt="ถั่วงอก 1 กก." class="h-16 w-auto object-contain drop-shadow-sm transition-transform group-hover:scale-105 peer-checked:scale-110" onerror="this.onerror=null; this.src='https://placehold.co/150x150/eff6ff/1e40af?text=1+KG';">
+                                    <div class="text-center mt-2">
+                                        <span class="block font-bold text-gray-800 text-lg peer-checked:text-blue-700">1 กก.</span>
+                                        <span class="text-xs text-gray-500">ถุงเล็ก</span>
+                                    </div>
+                                    <div class="absolute top-2 right-2 opacity-0 peer-checked:opacity-100 text-blue-600 transition-opacity">
+                                        <svg class="w-6 h-6 bg-white rounded-full" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                                    </div>
+                                </div>
+                            </label>
+
+                            <!-- ขนาด 2 กก. -->
+                            <label class="cursor-pointer relative group">
+                                <input type="radio" name="sproutSize" value="2" class="peer" onchange="calculateTotal()">
+                                <div class="h-full border-2 border-gray-100 rounded-2xl p-4 flex flex-col items-center justify-end gap-3 transition-all peer-checked:border-blue-600 peer-checked:bg-blue-50 peer-checked:shadow-md hover:border-blue-200 hover:bg-blue-50/50">
+                                    <img src="product.jpg" alt="ถั่วงอก 2 กก." class="h-20 w-auto object-contain drop-shadow-sm transition-transform group-hover:scale-105 peer-checked:scale-110" onerror="this.onerror=null; this.src='https://placehold.co/150x150/eff6ff/1e40af?text=2+KG';">
+                                    <div class="text-center mt-2">
+                                        <span class="block font-bold text-gray-800 text-lg peer-checked:text-blue-700">2 กก.</span>
+                                        <span class="text-xs text-gray-500">ถุงกลาง</span>
+                                    </div>
+                                    <div class="absolute top-2 right-2 opacity-0 peer-checked:opacity-100 text-blue-600 transition-opacity">
+                                        <svg class="w-6 h-6 bg-white rounded-full" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                                    </div>
+                                </div>
+                            </label>
+
+                            <!-- ขนาด 5 กก. -->
+                            <label class="cursor-pointer relative group">
+                                <input type="radio" name="sproutSize" value="5" class="peer" onchange="calculateTotal()">
+                                <div class="h-full border-2 border-gray-100 rounded-2xl p-4 flex flex-col items-center justify-end gap-3 transition-all peer-checked:border-blue-600 peer-checked:bg-blue-50 peer-checked:shadow-md hover:border-blue-200 hover:bg-blue-50/50">
+                                    <img src="product.jpg" alt="ถั่วงอก 5 กก." class="h-24 w-auto object-contain drop-shadow-md transition-transform group-hover:scale-105 peer-checked:scale-110" onerror="this.onerror=null; this.src='https://placehold.co/150x150/eff6ff/1e40af?text=5+KG';">
+                                    <div class="text-center mt-2">
+                                        <span class="block font-bold text-gray-800 text-lg peer-checked:text-blue-700">5 กก.</span>
+                                        <span class="text-xs text-gray-500">ถุงใหญ่</span>
+                                    </div>
+                                    <div class="absolute top-2 right-2 opacity-0 peer-checked:opacity-100 text-blue-600 transition-opacity">
+                                        <svg class="w-6 h-6 bg-white rounded-full" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- จำนวนถุง -->
+                    <div class="space-y-3">
+                        <label class="block font-medium text-gray-700">ระบุจำนวน (ถุง)</label>
+                        <div class="flex items-center gap-4 bg-gray-50 p-2 border border-gray-200 rounded-2xl w-full md:w-1/2">
+                            <button type="button" onclick="adjustQty(-1)" class="w-12 h-12 flex items-center justify-center bg-white border border-gray-200 rounded-xl hover:bg-gray-100 active:scale-95 transition-transform text-blue-600">
+                                <span class="text-xl font-bold">-</span>
+                            </button>
+                            <input type="number" id="sproutQuantity" name="sproutQuantity" required min="1" value="1" onchange="calculateTotal()"
+                                   class="flex-1 text-center bg-transparent text-2xl font-bold text-gray-800 focus:outline-none py-2">
+                            <button type="button" onclick="adjustQty(1)" class="w-12 h-12 flex items-center justify-center bg-white border border-gray-200 rounded-xl hover:bg-gray-100 active:scale-95 transition-transform text-blue-600">
+                                <span class="text-xl font-bold">+</span>
+                            </button>
+                        </div>
+                        <p class="text-blue-600 font-medium pt-2" id="liveTotalDisplay">ยอดรวมสั่งผลิต: <span class="text-xl font-bold">0</span> กิโลกรัม</p>
+                    </div>
+
+                    <!-- ส่วนที่ 3: แผนที่และการจัดส่ง -->
+                    <div class="space-y-3 pt-4 border-t border-gray-100">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="bg-blue-100 text-blue-700 w-8 h-8 rounded-full flex items-center justify-center font-bold">3</span>
+                            <h2 class="text-xl font-semibold text-gray-800">สถานที่จัดส่ง</h2>
+                        </div>
+                        
+                        <!-- Map Container -->
+                        <div class="border-2 border-blue-200 p-1 rounded-2xl bg-white shadow-sm relative">
+                            <div class="absolute top-4 right-4 z-[400] bg-white px-3 py-1.5 rounded-lg shadow-md text-xs font-bold text-blue-600 border border-blue-100 flex items-center gap-1 cursor-pointer hover:bg-blue-50 transition-colors" onclick="getCurrentLocation()">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                ดึงตำแหน่งปัจจุบัน
+                            </div>
+                            <div id="map" class="h-64 w-full rounded-xl z-0"></div>
+                            <p class="text-xs text-gray-500 mt-2 text-center pb-1">📍 เลื่อนหมุดเพื่อระบุจุดส่งของ</p>
+                        </div>
+
+                        <!-- เก็บค่าพิกัดซ่อนไว้ -->
+                        <input type="hidden" id="lat" name="lat" value="">
+                        <input type="hidden" id="lng" name="lng" value="">
+
+                        <!-- รายละเอียดที่อยู่แบบ Text -->
+                        <textarea name="deliveryAddress" required rows="3" placeholder="ระบุรายละเอียดเพิ่มเติม เช่น บ้านเลขที่, ซอย, จุดสังเกต หรือเบอร์โทรศัพท์..." 
+                                  class="w-full p-4 border border-gray-200 rounded-2xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all shadow-sm"></textarea>
+                    </div>
+                    
+                    <!-- ปุ่มยืนยัน (Sticky on mobile) -->
+                    <div class="mt-8 md:text-right sticky bottom-4 z-50 md:static">
+                        <button type="submit" 
+                                class="w-full text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 focus:ring-4 focus:ring-blue-200 font-bold rounded-2xl text-xl px-8 py-4 transition-all shadow-[0_4px_15px_rgb(37,99,235,0.4)] flex justify-center items-center gap-2">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                            ยืนยันการสั่งซื้อ
+                        </button>
+                    </div>
+                </form>
+
+                <!-- แจ้งเตือนสำเร็จ -->
+                <div id="orderStatus" class="mt-6 p-5 rounded-2xl hidden text-center border animate-pulse"></div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- 🔍 หน้าติดตามสถานะ (Tracking Page) -->
+            <!-- ========================================== -->
+            <div class="tab-content p-5 md:p-8" id="track-page">
+                <div class="max-w-2xl mx-auto">
+                    <div class="text-center mb-6">
+                        <h2 class="text-2xl font-bold text-gray-800">ติดตามสถานะการจัดส่ง</h2>
+                        <p class="text-gray-500 mt-1">กรอกชื่อของคุณเพื่อดูสถานะออเดอร์ล่าสุด</p>
+                    </div>
+
+                    <div class="flex flex-col md:flex-row gap-3 mb-8">
+                        <input type="text" id="searchNameInput" placeholder="ใส่ชื่อ-นามสกุล หรือ ชื่อร้านค้า ที่ใช้สั่งซื้อ..." 
+                               class="flex-1 p-4 border border-gray-200 rounded-2xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition-all text-lg shadow-sm"
+                               onkeypress="if(event.key === 'Enter') searchTracking()">
+                        <button onclick="searchTracking()" class="bg-blue-600 hover:bg-blue-700 active:scale-95 text-white px-8 py-4 md:py-auto rounded-2xl font-bold shadow-md transition-all whitespace-nowrap flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                            ค้นหา
+                        </button>
+                    </div>
+
+                    <!-- พื้นที่แสดงผลลัพธ์ -->
+                    <div id="trackingResult" class="hidden bg-white border border-gray-100 shadow-[0_4px_20px_rgb(0,0,0,0.03)] rounded-3xl p-6">
+                        <!-- ถูกเติมด้วย JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- 📊 หน้าหลังบ้าน (Admin Dashboard) -->
+            <!-- ========================================== -->
+            <div class="tab-content p-5 md:p-8 bg-gray-50" id="admin-page">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                            <span class="w-2 h-8 bg-blue-600 rounded-full inline-block"></span>
+                            แดชบอร์ดสรุปยอดผลิต
+                        </h2>
+                        <p class="text-gray-500 text-sm mt-1 pl-4">ข้อมูลออเดอร์ทั้งหมดเพื่อเตรียมการเพาะ</p>
+                    </div>
+                    
+                    <div class="flex gap-2 w-full sm:w-auto">
+                        <button onclick="clearAllOrders()" class="flex-1 sm:flex-none justify-center flex items-center gap-1 text-red-600 bg-white hover:bg-red-50 border border-red-200 font-semibold rounded-xl text-sm px-4 py-2.5 transition-all shadow-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            ล้างข้อมูล
+                        </button>
+                        <button onclick="refreshOrders()" class="flex-1 sm:flex-none justify-center flex items-center gap-1 text-white bg-blue-600 hover:bg-blue-700 font-semibold rounded-xl text-sm px-4 py-2.5 shadow-md transition-all">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                            อัปเดตข้อมูล
+                        </button>
+                    </div>
+                </div>
+
+                <!-- การ์ดสรุปยอด -->
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-5 mb-8">
+                    <div class="bg-white p-5 rounded-3xl border border-gray-100 shadow-[0_2px_10px_rgb(0,0,0,0.02)] relative overflow-hidden">
+                        <div class="absolute -right-4 -top-4 w-16 h-16 bg-gray-50 rounded-full"></div>
+                        <p class="text-sm text-gray-500 font-medium mb-1 relative z-10">ออเดอร์ทั้งหมด</p>
+                        <p class="text-3xl font-black text-gray-800 relative z-10"><span id="summaryOrderCount">0</span> <span class="text-base font-normal text-gray-400">บิล</span></p>
+                    </div>
+                    <div class="bg-gradient-to-br from-blue-600 to-blue-800 p-5 rounded-3xl shadow-[0_8px_20px_rgb(37,99,235,0.2)] text-white col-span-2 md:col-span-1">
+                        <p class="text-sm text-blue-100 font-medium mb-1">เป้าหมายที่ต้องผลิต (น้ำหนักรวม)</p>
+                        <p class="text-3xl font-black"><span id="summaryTotalWeight">0</span> <span class="text-base font-normal text-blue-200">กิโลกรัม</span></p>
+                    </div>
+                    <div class="bg-white p-5 rounded-3xl border border-gray-100 shadow-[0_2px_10px_rgb(0,0,0,0.02)] relative overflow-hidden hidden md:block">
+                         <div class="absolute -right-4 -top-4 w-16 h-16 bg-blue-50 rounded-full"></div>
+                        <p class="text-sm text-gray-500 font-medium mb-1 relative z-10">จำนวนถุงที่ใช้</p>
+                        <p class="text-3xl font-black text-gray-800 relative z-10"><span id="summaryTotalBags">0</span> <span class="text-base font-normal text-gray-400">ถุง</span></p>
+                    </div>
+                </div>
+
+                <!-- ตาราง -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left text-gray-600">
+                            <thead class="text-xs text-gray-500 uppercase bg-gray-50/80 border-b border-gray-100">
+                                <tr>
+                                    <th scope="col" class="px-6 py-4 font-bold tracking-wider">ลูกค้า & เวลา</th>
+                                    <th scope="col" class="px-6 py-4 font-bold tracking-wider">รายการ</th>
+                                    <th scope="col" class="px-6 py-4 font-bold tracking-wider text-right">น้ำหนักสุทธิ</th>
+                                    <th scope="col" class="px-6 py-4 font-bold tracking-wider">พิกัดจัดส่ง</th>
+                                    <th scope="col" class="px-6 py-4 font-bold tracking-wider text-center">สถานะ</th>
+                                    <th scope="col" class="px-6 py-4 font-bold tracking-wider text-center">จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ordersTableBody" class="divide-y divide-gray-100">
+                                <!-- JS จะนำข้อมูลมาใส่ตรงนี้ -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Leaflet JS (สำหรับแผนที่) -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <script>
+        const STORAGE_KEY = 'farmNgokNgoeyOrders';
+        
+        let map;
+        let marker;
+
+        function initMap() {
+            if (map) return;
+            const defaultLoc = [13.7649, 100.5383];
+            map = L.map('map').setView(defaultLoc, 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '© OpenStreetMap'
+            }).addTo(map);
+
+            marker = L.marker(defaultLoc, {draggable: true}).addTo(map);
+            updateLatLngInput(defaultLoc[0], defaultLoc[1]);
+
+            marker.on('dragend', function (e) {
+                const position = marker.getLatLng();
+                updateLatLngInput(position.lat, position.lng);
+            });
+
+            map.on('click', function(e) {
+                marker.setLatLng(e.latlng);
+                updateLatLngInput(e.latlng.lat, e.latlng.lng);
+            });
+
+            getCurrentLocation();
+        }
+
+        function updateLatLngInput(lat, lng) {
+            document.getElementById('lat').value = lat;
+            document.getElementById('lng').value = lng;
+        }
+
+        function getCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        map.setView([lat, lng], 16);
+                        marker.setLatLng([lat, lng]);
+                        updateLatLngInput(lat, lng);
+                    },
+                    (error) => {
+                        console.log("ไม่สามารถดึงตำแหน่งได้", error);
+                    }
+                );
+            }
+        }
+
+        function getOrders() {
+            const data = localStorage.getItem(STORAGE_KEY);
+            return data ? JSON.parse(data) : [];
+        }
+
+        function saveOrder(order) {
+            const orders = getOrders();
+            orders.unshift(order); 
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
+        }
+
+        function deleteOrder(id) {
+            if(confirm('ต้องการลบรายการนี้ใช่หรือไม่?')) {
+                let orders = getOrders();
+                orders = orders.filter(order => order.id !== id);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
+                refreshOrders();
+            }
+        }
+
+        function clearAllOrders() {
+            if(confirm('🚨 คำเตือน: ลบข้อมูลออเดอร์ทั้งหมด?\n\n(ข้อมูลจะไม่สามารถกู้คืนได้)')) {
+                localStorage.removeItem(STORAGE_KEY);
+                refreshOrders();
+            }
+        }
+
+        function adjustQty(amount) {
+            const input = document.getElementById('sproutQuantity');
+            let val = parseInt(input.value) + amount;
+            if(val < 1) val = 1;
+            input.value = val;
+            calculateTotal();
+        }
+
+        function calculateTotal() {
+            const sizeRadio = document.querySelector('input[name="sproutSize"]:checked');
+            const qty = document.getElementById('sproutQuantity').value;
+            const display = document.getElementById('liveTotalDisplay').querySelector('span');
+            
+            if(sizeRadio && qty) {
+                display.innerText = (parseFloat(sizeRadio.value) * parseInt(qty)).toString();
+            }
+        }
+
+        function openTab(evt, tabName) {
+            const tabcontent = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove("active");
+            }
+            const tablinks = document.getElementsByClassName("tab-btn");
+            for (let i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active", "border-blue-600", "text-blue-700");
+                tablinks[i].classList.add("border-transparent", "text-gray-400");
+            }
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active", "border-blue-600", "text-blue-700");
+            evt.currentTarget.classList.remove("border-transparent", "text-gray-400");
+
+            if(tabName === 'order-page') {
+                setTimeout(() => { if(map) map.invalidateSize(); }, 100);
+            }
+
+            if(tabName === 'admin-page') {
+                refreshOrders();
+            }
+        }
+
+        function handleOrderSubmit(event) {
+            event.preventDefault(); 
+            const form = event.target;
+            const formData = new FormData(form);
+            const statusDiv = document.getElementById('orderStatus');
+
+            const size = parseFloat(formData.get('sproutSize'));
+            const qty = parseInt(formData.get('sproutQuantity'));
+            const totalWeight = size * qty;
+
+            const order = {
+                id: Date.now(),
+                timestamp: new Date().toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' }),
+                name: formData.get('customerName').trim(),
+                size: size,
+                quantity: qty,
+                address: formData.get('deliveryAddress'),
+                lat: formData.get('lat'),
+                lng: formData.get('lng'),
+                totalWeight: totalWeight,
+                status: 'received' // เพิ่มฟิลด์สถานะเริ่มต้น
+            };
+
+            saveOrder(order);
+
+            statusDiv.innerHTML = `
+                <div class="flex flex-col items-center">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-3">
+                        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                    </div>
+                    <strong class="text-xl text-blue-800">ส่งออเดอร์เรียบร้อย!</strong>
+                    <span class="text-blue-600 mt-2 font-medium">เตรียมผลิตให้คุณ <b>${order.name}</b> จำนวน ${order.totalWeight} กก.</span>
+                </div>
+            `;
+            statusDiv.classList.remove('hidden', 'bg-white', 'border-gray-200');
+            statusDiv.classList.add('block', 'bg-blue-50', 'border-blue-200');
+            
+            form.reset(); 
+            document.getElementById('liveTotalDisplay').querySelector('span').innerText = '0';
+            
+            if(map) {
+                getCurrentLocation();
+            }
+
+            setTimeout(() => {
+                statusDiv.classList.add('hidden');
+                statusDiv.classList.remove('block');
+            }, 6000);
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function loadOrdersTable() {
+            const tableBody = document.getElementById('ordersTableBody');
+            const orders = getOrders();
+            tableBody.innerHTML = ''; 
+
+            if(orders.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="px-6 py-16 text-center text-gray-400 bg-white">
+                            <div class="flex flex-col items-center justify-center">
+                                <svg class="w-16 h-16 mb-4 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                                <p class="text-lg font-medium">ยังไม่มีออเดอร์วันนี้</p>
+                                <p class="text-sm mt-1">รอรับออเดอร์จากลูกค้าหน้าบ้าน</p>
+                            </div>
+                        </td>
+                    </tr>`;
+                return;
+            }
+
+            orders.forEach(order => {
+                const currentStatus = order.status || 'received';
+                const row = document.createElement('tr');
+                row.className = 'bg-white hover:bg-blue-50/50 transition-colors border-b border-gray-50';
+                
+                let mapLinkHTML = '';
+                if(order.lat && order.lng) {
+                    const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${order.lat},${order.lng}`;
+                    mapLinkHTML = `<a href="${googleMapsUrl}" target="_blank" class="inline-flex items-center gap-1 mt-2 text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg hover:bg-blue-100 transition-colors">
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path></svg>
+                        เปิดนำทาง
+                    </a>`;
+                }
+
+                row.innerHTML = `
+                    <td class="px-6 py-4">
+                        <div class="font-bold text-gray-800">${order.name}</div>
+                        <div class="text-xs text-gray-400 mt-1">${order.timestamp}</div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="inline-flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-100">
+                            <span class="font-semibold text-gray-700">${order.size} กก.</span>
+                            <span class="text-gray-300">×</span>
+                            <span class="font-semibold text-gray-700">${order.quantity} ถุง</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                        <span class="font-black text-lg text-blue-600">${order.totalWeight}</span> <span class="text-xs text-gray-500">กก.</span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="text-xs text-gray-600 max-w-[200px] line-clamp-2" title="${order.address}">${order.address}</div>
+                        ${mapLinkHTML}
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        <select onchange="updateOrderStatus(${order.id}, this.value)" class="bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 outline-none cursor-pointer font-medium">
+                            <option value="received" ${currentStatus === 'received' ? 'selected' : ''}>📥 รับคำสั่งซื้อ</option>
+                            <option value="producing" ${currentStatus === 'producing' ? 'selected' : ''}>🌱 กำลังผลิต</option>
+                            <option value="delivering" ${currentStatus === 'delivering' ? 'selected' : ''}>🚚 กำลังขนส่ง</option>
+                            <option value="delivered" ${currentStatus === 'delivered' ? 'selected' : ''}>✅ ส่งเรียบร้อย</option>
+                        </select>
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        <button onclick="deleteOrder(${order.id})" class="text-gray-400 hover:text-red-500 p-2 rounded-xl hover:bg-red-50 transition-all" title="ลบออเดอร์">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function loadAdminSummary() {
+            const orders = getOrders();
+            document.getElementById('summaryOrderCount').innerText = orders.length;
+            document.getElementById('summaryTotalWeight').innerText = orders.reduce((sum, order) => sum + order.totalWeight, 0);
+            document.getElementById('summaryTotalBags').innerText = orders.reduce((sum, order) => sum + order.quantity, 0);
+        }
+
+        function refreshOrders() {
+            loadOrdersTable();
+            loadAdminSummary();
+        }
+
+        // --- ระบบอัปเดตสถานะและติดตาม ---
+        function updateOrderStatus(id, newStatus) {
+            let orders = getOrders();
+            const orderIndex = orders.findIndex(o => o.id === id);
+            
+            if (orderIndex !== -1) {
+                // เปลี่ยนสถานะของออเดอร์นี้
+                orders[orderIndex].status = newStatus;
+                
+                // ถ้าระบุว่าคนสั่งคนเดียวกัน มักจะส่งพร้อมกัน
+                // โค้ดส่วนนี้จะช่วยเปลี่ยนสถานะของทุกออเดอร์ที่เป็นชื่อเดียวกันให้เป็นสถานะเดียวกันอัตโนมัติ
+                const customerName = orders[orderIndex].name;
+                orders.forEach(o => {
+                    if(o.name === customerName) {
+                        o.status = newStatus;
+                    }
+                });
+                
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
+                refreshOrders(); // รีเฟรชตารางเพื่ออัปเดต Dropdown ให้ตรงกันทั้งหมด
+            }
+        }
+
+        function searchTracking() {
+            const searchName = document.getElementById('searchNameInput').value.trim().toLowerCase();
+            const resultDiv = document.getElementById('trackingResult');
+            
+            if (!searchName) {
+                alert('กรุณากรอกชื่อที่ใช้สั่งซื้อ');
+                return;
+            }
+
+            const orders = getOrders();
+            // ค้นหาออเดอร์ที่ชื่อคล้ายกับที่ค้นหา
+            const customerOrders = orders.filter(o => o.name.toLowerCase().includes(searchName));
+
+            if (customerOrders.length === 0) {
+                resultDiv.innerHTML = `
+                    <div class="text-center py-8">
+                        <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-3 text-red-500">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-800">ไม่พบข้อมูลคำสั่งซื้อ</h3>
+                        <p class="text-gray-500 mt-1">โปรดตรวจสอบชื่อที่กรอกอีกครั้ง</p>
+                    </div>
+                `;
+                resultDiv.classList.remove('hidden');
+                return;
+            }
+
+            // รวมยอดน้ำหนักทั้งหมดของคนๆ นี้
+            const totalWeight = customerOrders.reduce((sum, o) => sum + o.totalWeight, 0);
+            
+            // หาสถานะล่าสุด
+            const statusWeights = { 'received': 1, 'producing': 2, 'delivering': 3, 'delivered': 4 };
+            let maxStatusWeight = 0;
+            let currentStatus = 'received';
+            
+            customerOrders.forEach(o => {
+                const s = o.status || 'received';
+                if (statusWeights[s] > maxStatusWeight) {
+                    maxStatusWeight = statusWeights[s];
+                    currentStatus = s;
+                }
+            });
+
+            const realName = customerOrders[0].name;
+
+            // ข้อมูลสำหรับ Timeline
+            const steps = [
+                { id: 'received', label: 'รับคำสั่งซื้อ', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>' },
+                { id: 'producing', label: 'กำลังผลิต', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>' },
+                { id: 'delivering', label: 'กำลังขนส่ง', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>' },
+                { id: 'delivered', label: 'ส่งเรียบร้อย', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>' }
+            ];
+
+            let timelineHTML = `<div class="mb-8 pb-6 border-b border-gray-100 flex justify-between items-center">
+                <div>
+                    <h3 class="font-bold text-gray-800 text-lg">คุณ ${realName}</h3>
+                    <p class="text-sm text-gray-500">ยอดสั่งผลิตรวม</p>
+                </div>
+                <div class="text-right">
+                    <span class="text-3xl font-black text-blue-600">${totalWeight}</span>
+                    <span class="text-gray-500 font-medium"> กก.</span>
+                </div>
+            </div>
+            
+            <div class="relative px-2 md:px-0">
+                <!-- เส้นพื้นหลัง (ปรับตามขนาดหน้าจอ) -->
+                <div class="absolute left-8 top-0 bottom-0 w-1 bg-gray-100 md:left-12 md:right-12 md:top-6 md:h-1 md:w-auto md:bottom-auto rounded-full"></div>
+                
+                <div class="flex flex-col md:flex-row justify-between gap-8 md:gap-2 relative z-10">`;
+
+            steps.forEach((step, index) => {
+                const isCompleted = statusWeights[currentStatus] >= statusWeights[step.id];
+                const isActive = currentStatus === step.id;
+                
+                const bgColor = isActive ? 'bg-blue-600 ring-4 ring-blue-100' : (isCompleted ? 'bg-blue-500' : 'bg-white border-4 border-gray-100');
+                const textColor = isActive ? 'text-blue-800 font-bold' : (isCompleted ? 'text-gray-800 font-semibold' : 'text-gray-400 font-medium');
+                const iconColor = isCompleted ? 'text-white' : 'text-gray-300';
+                
+                timelineHTML += `
+                    <div class="flex md:flex-col items-center gap-5 md:gap-3 w-full">
+                        <div class="w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center shrink-0 transition-all ${bgColor} ${iconColor} shadow-sm z-10">
+                            <svg class="w-6 h-6 md:w-7 md:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">${step.icon}</svg>
+                        </div>
+                        <div class="md:text-center w-full">
+                            <p class="text-base md:text-lg ${textColor}">${step.label}</p>
+                            ${isActive ? '<span class="text-xs font-bold bg-blue-100 text-blue-700 px-3 py-1 rounded-full mt-1.5 inline-block">สถานะปัจจุบัน</span>' : ''}
+                        </div>
+                    </div>
+                `;
+            });
+
+            timelineHTML += `</div></div>`;
+            
+            resultDiv.innerHTML = timelineHTML;
+            resultDiv.classList.remove('hidden');
+        }
+
+        window.addEventListener('load', () => {
+            initMap(); 
+            refreshOrders();
+            calculateTotal();
+        });
+    </script>
+</body>
+</html>
