@@ -101,7 +101,7 @@
                             <span class="font-semibold text-gray-700">จำนวนที่ต้องการ (ถุง)</span>
                             <div class="flex items-center gap-3">
                                 <button type="button" onclick="adjustQty(-1)" class="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center font-bold text-xl text-gray-600">-</button>
-                                <input type="number" id="qtyInput" name="sproutQuantity" value="1" min="1" max="9999" class="w-12 text-center font-bold text-xl text-green-700 bg-transparent outline-none">
+                                <input type="number" id="qtyInput" name="sproutQuantity" value="1" min="1" max="9999" class="w-20 text-center font-bold text-xl text-green-700 bg-transparent outline-none">
                                 <button type="button" onclick="adjustQty(1)" class="w-10 h-10 rounded-full bg-green-100 hover:bg-green-200 flex items-center justify-center font-bold text-xl text-green-700">+</button>
                             </div>
                         </div>
@@ -201,25 +201,46 @@
             <!-- 📊 หน้าหลังบ้าน (Admin Dashboard) -->
             <!-- ========================================== -->
             <div class="tab-content p-5 md:p-8" id="admin-page">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-bold text-gray-800">รายการสั่งซื้อทั้งหมด</h2>
-                    <button onclick="clearAllOrders()" class="text-red-500 text-sm hover:underline">ล้างข้อมูลทั้งหมด</button>
+                <!-- ฟอร์มล็อกอินเข้าสู่ระบบหลังบ้าน -->
+                <div id="adminLoginBox" class="flex flex-col items-center justify-center py-10">
+                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                        <svg class="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                    </div>
+                    <h2 class="text-xl font-bold text-gray-800 mb-1">สำหรับเจ้าหน้าที่เท่านั้น</h2>
+                    <p class="text-sm text-gray-500 mb-6">กรุณาใส่รหัสผ่านเพื่อเข้าดูข้อมูลหลังบ้าน</p>
+                    
+                    <div class="flex gap-2 w-full max-w-xs">
+                        <input type="password" id="adminPasswordInput" placeholder="รหัสผ่าน..." class="flex-1 p-3 border border-gray-200 rounded-xl bg-gray-50 outline-none focus:ring-2 focus:ring-green-500 text-center tracking-widest">
+                        <button onclick="loginAdmin()" class="bg-gray-800 hover:bg-gray-900 text-white px-5 py-3 rounded-xl font-bold transition">เข้าสู่ระบบ</button>
+                    </div>
+                    <p id="adminErrorText" class="text-red-500 text-sm mt-3 hidden">❌ รหัสผ่านไม่ถูกต้อง</p>
                 </div>
-                <div class="overflow-x-auto rounded-xl border border-gray-200">
-                    <table class="w-full text-sm text-left">
-                        <thead class="bg-gray-50 text-gray-600">
-                            <tr>
-                                <th class="p-3">ลูกค้า / วันรับของ</th>
-                                <th class="p-3">รายการ</th>
-                                <th class="p-3">สถานะ</th>
-                                <th class="p-3 text-center">ลบ</th>
-                            </tr>
-                        </thead>
-                        <tbody id="ordersTableBody" class="divide-y divide-gray-100">
-                            <!-- แถวตาราง -->
-                        </tbody>
-                    </table>
-                </div>
+
+                <!-- เนื้อหาหลังบ้าน (ซ่อนไว้จนกว่าจะล็อกอินผ่าน) -->
+                <div id="adminDashboardContent" class="hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-gray-800">รายการสั่งซื้อทั้งหมด</h2>
+                        <div class="flex gap-4 items-center">
+                            <button onclick="logoutAdmin()" class="text-gray-500 text-sm hover:text-gray-800 font-bold border-r pr-4 border-gray-300">ออกจากระบบ</button>
+                            <button onclick="clearAllOrders()" class="text-red-500 text-sm hover:underline">ล้างข้อมูลทั้งหมด</button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto rounded-xl border border-gray-200">
+                        <table class="w-full text-sm text-left">
+                            <thead class="bg-gray-50 text-gray-600">
+                                <tr>
+                                    <th class="p-3">ลูกค้า / วันรับของ</th>
+                                    <th class="p-3">รายการ</th>
+                                    <th class="p-3">สถานะ</th>
+                                    <th class="p-3 text-center">ลบ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ordersTableBody" class="divide-y divide-gray-100">
+                                <!-- แถวตาราง -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div> <!-- ปิด div adminDashboardContent -->
             </div>
 
         </div>
@@ -232,6 +253,7 @@
         const YOUR_LINE_ID = "@yourlineid"; 
         
         const STORAGE_KEY = 'sprout_orders_v3';
+        const ADMIN_PASSWORD = '1234'; // <--- ตั้งรหัสผ่านสำหรับเข้าหลังบ้านตรงนี้ครับ (แก้ตัวเลขได้เลย)
 
         let map, marker;
 
@@ -317,7 +339,9 @@
             btn.classList.remove('border-transparent', 'text-gray-400');
             btn.classList.add('border-green-600', 'text-green-700', 'bg-green-50/50');
 
-            if(tabId === 'admin-page') refreshOrders();
+            if(tabId === 'admin-page') {
+                checkAdminAuth();
+            }
             
             // รีเฟรชแผนที่เมื่อเปิดกลับมาหน้าสั่งซื้อ
             if(tabId === 'order-page' && map) {
@@ -325,10 +349,41 @@
             }
         }
 
+        // --- ระบบล็อกอินหน้าหลังบ้าน ---
+        function checkAdminAuth() {
+            const isLoggedIn = sessionStorage.getItem('isAdminLoggedIn') === 'true';
+            if (isLoggedIn) {
+                document.getElementById('adminLoginBox').classList.add('hidden');
+                document.getElementById('adminDashboardContent').classList.remove('hidden');
+                refreshOrders();
+            } else {
+                document.getElementById('adminLoginBox').classList.remove('hidden');
+                document.getElementById('adminDashboardContent').classList.add('hidden');
+            }
+        }
+
+        function loginAdmin() {
+            const pass = document.getElementById('adminPasswordInput').value;
+            if (pass === ADMIN_PASSWORD) {
+                sessionStorage.setItem('isAdminLoggedIn', 'true');
+                document.getElementById('adminPasswordInput').value = '';
+                document.getElementById('adminErrorText').classList.add('hidden');
+                checkAdminAuth();
+            } else {
+                document.getElementById('adminErrorText').classList.remove('hidden');
+            }
+        }
+
+        function logoutAdmin() {
+            sessionStorage.removeItem('isAdminLoggedIn');
+            checkAdminAuth();
+        }
+
         function adjustQty(change) {
             const input = document.getElementById('qtyInput');
             let val = parseInt(input.value) + change;
             if (val < 1) val = 1;
+            if (val > 9999) val = 9999;
             input.value = val;
         }
 
