@@ -12,180 +12,249 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <style>
-        body { font-family: 'Prompt', sans-serif; background-color: #f4f7f6; }
+        body { font-family: 'Prompt', sans-serif; background-color: #f0fdf4; }
         .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.3s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-        /* แต่ง Scrollbar */
+        .tab-content.active { display: block; animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(10px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+        /* แต่ง Scrollbar ให้เนียนตา */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        /* ซ่อน input number arrows */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
     </style>
 </head>
-<body class="text-gray-800 antialiased selection:bg-green-200 selection:text-green-900 pb-20">
+<body class="text-slate-800 antialiased selection:bg-green-200 selection:text-green-900 pb-20">
 
     <div class="max-w-4xl mx-auto md:py-8 px-0 md:px-4">
-        <!-- Header โทนสีเขียวแบบในภาพ -->
-        <header class="bg-[#00b900] text-white p-6 md:rounded-t-3xl shadow-md">
-            <div class="flex items-center gap-4 max-w-2xl mx-auto md:mx-0">
-                <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm text-3xl border-2 border-white">
-                    🌱
+        
+        <!-- ========================================== -->
+        <!-- 🌾 ส่วน Header (เปลี่ยนพื้นหลังและโลโก้ได้ที่นี่) -->
+        <!-- ========================================== -->
+        <header class="relative bg-gradient-to-br from-green-600 to-green-800 text-white p-6 md:p-10 md:rounded-t-[2rem] shadow-xl overflow-hidden">
+            <!-- รูปภาพพื้นหลัง Header (ใส่รูปฟาร์ม) -->
+            <img src="https://images.unsplash.com/photo-1595855761858-a53ce20c6db9?auto=format&fit=crop&q=80&w=1200" 
+                 class="absolute inset-0 w-full h-full object-cover opacity-20 mix-blend-overlay" alt="Farm background">
+            
+            <div class="relative z-10 flex flex-col md:flex-row items-center gap-5 max-w-2xl mx-auto md:mx-0 text-center md:text-left">
+                <!-- รูปภาพโลโก้สินค้า (เปลี่ยนลิงก์เป็นรูปของคุณ เช่น src="./page.png") -->
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?auto=format&fit=crop&q=80&w=200" 
+                         class="w-24 h-24 md:w-28 md:h-28 rounded-full border-4 border-white shadow-lg object-cover bg-white" alt="โลโก้ฟาร์มงอกเงย">
+                    <div class="absolute -bottom-2 -right-2 bg-yellow-400 text-yellow-900 text-xs font-bold px-3 py-1 rounded-full shadow-md border-2 border-white">
+                        ออร์แกนิก 100%
+                    </div>
                 </div>
                 <div>
-                    <h1 class="text-2xl md:text-3xl font-bold tracking-wide">ฟาร์มงอกเงย</h1>
-                    <p class="text-green-50 mt-1 text-sm md:text-base font-light">สั่งถั่วงอกสดใหม่ ส่งตรงถึงหน้าบ้าน/ร้านคุณ</p>
+                    <h1 class="text-3xl md:text-4xl font-bold tracking-wide drop-shadow-md">ฟาร์มงอกเงย</h1>
+                    <p class="text-green-50 mt-2 text-sm md:text-base font-light drop-shadow-sm opacity-90 max-w-sm">
+                        ถั่วงอกออร์แกนิก ปลอดสารพิษ สดใหม่ กรอบอร่อย ส่งตรงจากฟาร์มถึงหน้าบ้านคุณ
+                    </p>
                 </div>
             </div>
         </header>
 
         <!-- Main Content -->
-        <div class="bg-white md:rounded-b-3xl shadow-lg min-h-[600px]">
+        <div class="bg-white md:rounded-b-[2rem] shadow-2xl min-h-[600px] relative z-20 -mt-2 md:mt-0 rounded-t-3xl">
             
             <!-- Navigation Tabs -->
-            <div class="flex border-b border-gray-100 overflow-x-auto bg-white md:rounded-t-none shadow-sm relative z-10">
-                <button onclick="window.openTab(event, 'order-page')" class="tab-btn active flex-1 py-4 px-2 text-center font-semibold text-[#00b900] border-b-[3px] border-[#00b900] transition-colors min-w-[100px] text-sm md:text-base">
-                    🛒 สั่งซื้อ
+            <div class="flex border-b border-gray-100 overflow-x-auto bg-white rounded-t-3xl md:rounded-t-none shadow-sm relative z-10 sticky top-0 md:static">
+                <button onclick="window.openTab(event, 'order-page')" class="tab-btn active flex-1 py-4 px-2 text-center font-bold text-[#00b900] border-b-[3px] border-[#00b900] transition-colors min-w-[100px] text-sm md:text-base hover:bg-green-50/50">
+                    🛒 สั่งสินค้า
                 </button>
-                <button onclick="window.openTab(event, 'track-page')" class="tab-btn flex-1 py-4 px-2 text-center font-semibold text-gray-500 border-b-[3px] border-transparent hover:text-[#00b900] transition-colors min-w-[100px] text-sm md:text-base">
-                    📦 ติดตาม
+                <button onclick="window.openTab(event, 'track-page')" class="tab-btn flex-1 py-4 px-2 text-center font-bold text-gray-400 border-b-[3px] border-transparent hover:text-[#00b900] hover:bg-green-50/50 transition-colors min-w-[100px] text-sm md:text-base">
+                    📦 ติดตามพัสดุ
                 </button>
-                <button onclick="window.openTab(event, 'admin-page')" class="tab-btn flex-1 py-4 px-2 text-center font-semibold text-gray-500 border-b-[3px] border-transparent hover:text-[#00b900] transition-colors min-w-[100px] text-sm md:text-base">
-                    ⚙️ หลังบ้าน
+                <button onclick="window.openTab(event, 'admin-page')" class="tab-btn flex-1 py-4 px-2 text-center font-bold text-gray-400 border-b-[3px] border-transparent hover:text-[#00b900] hover:bg-green-50/50 transition-colors min-w-[100px] text-sm md:text-base">
+                    ⚙️ ระบบหลังบ้าน
                 </button>
             </div>
 
             <!-- ========================================== -->
             <!-- 🛒 หน้าสั่งซื้อสินค้า (Order Page) -->
             <!-- ========================================== -->
-            <div class="tab-content active p-5 md:p-8 bg-gray-50/50 md:rounded-b-3xl" id="order-page">
+            <div class="tab-content active p-5 md:p-8 bg-slate-50/30 md:rounded-b-[2rem]" id="order-page">
                 <form id="orderForm" onsubmit="window.handleOrderSubmit(event)">
                     
                     <!-- ส่วนที่ 1: เลือกขนาดและจำนวน -->
-                    <div class="mb-8 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                        <h2 class="text-lg font-bold text-gray-800 mb-5 flex items-center gap-3">
-                            <span class="bg-green-100 text-green-700 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold">1</span> 
-                            เลือกสินค้าที่ต้องการ
+                    <div class="mb-8 bg-white p-1 rounded-2xl">
+                        <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-3 px-2">
+                            <span class="bg-green-100 text-green-700 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shadow-sm">1</span> 
+                            เลือกขนาดที่ต้องการ
                         </h2>
                         
-                        <!-- ขนาดถุง -->
-                        <div class="grid grid-cols-3 gap-3">
-                            <label class="relative cursor-pointer">
+                        <!-- ขนาดถุง (Cards) -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 px-2">
+                            
+                            <!-- สินค้า 1: ถุงเล็ก -->
+                            <label class="relative cursor-pointer group">
                                 <input type="radio" name="sproutSize" value="1" class="peer sr-only">
-                                <div class="p-4 rounded-xl border-2 border-gray-100 bg-white peer-checked:border-[#00b900] peer-checked:bg-green-50/30 hover:bg-gray-50 transition-all text-center h-full flex flex-col justify-center">
-                                    <div class="text-3xl mb-2">🌱</div>
-                                    <div class="font-bold text-gray-800 text-sm md:text-base">ถุงเล็กสุด</div>
-                                    <div class="text-[#00b900] font-semibold mt-1 text-xs md:text-sm">1 กิโลกรัม</div>
+                                <div class="rounded-2xl border-2 border-slate-100 bg-white overflow-hidden peer-checked:border-[#00b900] peer-checked:bg-green-50/20 transition-all shadow-sm group-hover:shadow-md h-full flex flex-col relative">
+                                    <!-- เปลี่ยนรูปสินค้า 1 กก. ได้ที่นี่ -->
+                                    <div class="relative h-40 overflow-hidden bg-slate-100">
+                                        <img src="https://images.unsplash.com/photo-1598514982205-f36b96d1e8d4?auto=format&fit=crop&q=80&w=400" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="ถั่วงอก 1 กก.">
+                                        <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+                                        <div class="absolute bottom-2 left-3 text-white font-bold text-sm">แพ็คประหยัด</div>
+                                    </div>
+                                    <div class="p-4 flex flex-col flex-1 justify-center text-center">
+                                        <div class="font-bold text-slate-700 text-lg">ถุงเล็ก (ทดลอง)</div>
+                                        <div class="text-[#00b900] font-extrabold text-2xl mt-1">1 กก.</div>
+                                    </div>
+                                    <!-- ไอคอนติ๊กถูก (จะโผล่เมื่อเลือก) -->
+                                    <div class="absolute top-3 right-3 bg-[#00b900] text-white rounded-full p-1 opacity-0 peer-checked:opacity-100 transition-opacity shadow-md transform scale-50 peer-checked:scale-100 duration-200">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                    </div>
                                 </div>
                             </label>
-                            <label class="relative cursor-pointer">
+
+                            <!-- สินค้า 2: ถุงกลาง -->
+                            <label class="relative cursor-pointer group">
                                 <input type="radio" name="sproutSize" value="5" class="peer sr-only" checked>
-                                <div class="p-4 rounded-xl border-2 border-gray-100 bg-white peer-checked:border-[#00b900] peer-checked:bg-green-50/30 hover:bg-gray-50 transition-all text-center h-full flex flex-col justify-center">
-                                    <div class="text-3xl mb-2">🛍️</div>
-                                    <div class="font-bold text-gray-800 text-sm md:text-base">ถุงกลาง</div>
-                                    <div class="text-[#00b900] font-semibold mt-1 text-xs md:text-sm">5 กิโลกรัม</div>
+                                <!-- โบว์แนะนำ -->
+                                <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-red-500 text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-md z-10 whitespace-nowrap tracking-wide">ขายดีที่สุด 🔥</div>
+                                <div class="rounded-2xl border-2 border-slate-100 bg-white overflow-hidden peer-checked:border-[#00b900] peer-checked:bg-green-50/20 transition-all shadow-sm group-hover:shadow-md h-full flex flex-col relative">
+                                    <!-- เปลี่ยนรูปสินค้า 5 กก. ได้ที่นี่ -->
+                                    <div class="relative h-40 overflow-hidden bg-slate-100">
+                                        <img src="https://images.unsplash.com/photo-1610832958506-aa56368176cf?auto=format&fit=crop&q=80&w=400" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="ถั่วงอก 5 กก.">
+                                        <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+                                        <div class="absolute bottom-2 left-3 text-white font-bold text-sm">แพ็คครอบครัว</div>
+                                    </div>
+                                    <div class="p-4 flex flex-col flex-1 justify-center text-center">
+                                        <div class="font-bold text-slate-700 text-lg">ถุงกลาง (คุ้มค่า)</div>
+                                        <div class="text-[#00b900] font-extrabold text-2xl mt-1">5 กก.</div>
+                                    </div>
+                                    <div class="absolute top-3 right-3 bg-[#00b900] text-white rounded-full p-1 opacity-0 peer-checked:opacity-100 transition-opacity shadow-md transform scale-50 peer-checked:scale-100 duration-200">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                    </div>
                                 </div>
                             </label>
-                            <label class="relative cursor-pointer">
+
+                            <!-- สินค้า 3: ถุงใหญ่ -->
+                            <label class="relative cursor-pointer group">
                                 <input type="radio" name="sproutSize" value="10" class="peer sr-only">
-                                <div class="p-4 rounded-xl border-2 border-gray-100 bg-white peer-checked:border-[#00b900] peer-checked:bg-green-50/30 hover:bg-gray-50 transition-all text-center h-full flex flex-col justify-center">
-                                    <div class="text-3xl mb-2">📦</div>
-                                    <div class="font-bold text-gray-800 text-sm md:text-base">ถุงใหญ่</div>
-                                    <div class="text-[#00b900] font-semibold mt-1 text-xs md:text-sm">10 กิโลกรัม</div>
+                                <div class="rounded-2xl border-2 border-slate-100 bg-white overflow-hidden peer-checked:border-[#00b900] peer-checked:bg-green-50/20 transition-all shadow-sm group-hover:shadow-md h-full flex flex-col relative">
+                                    <!-- เปลี่ยนรูปสินค้า 10 กก. ได้ที่นี่ -->
+                                    <div class="relative h-40 overflow-hidden bg-slate-100">
+                                        <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=400" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="ถั่วงอก 10 กก.">
+                                        <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+                                        <div class="absolute bottom-2 left-3 text-white font-bold text-sm">แพ็คราคาส่ง</div>
+                                    </div>
+                                    <div class="p-4 flex flex-col flex-1 justify-center text-center">
+                                        <div class="font-bold text-slate-700 text-lg">ถุงใหญ่ (ร้านอาหาร)</div>
+                                        <div class="text-[#00b900] font-extrabold text-2xl mt-1">10 กก.</div>
+                                    </div>
+                                    <div class="absolute top-3 right-3 bg-[#00b900] text-white rounded-full p-1 opacity-0 peer-checked:opacity-100 transition-opacity shadow-md transform scale-50 peer-checked:scale-100 duration-200">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                    </div>
                                 </div>
                             </label>
                         </div>
 
                         <!-- จำนวนถุง -->
-                        <div class="mt-6 flex flex-col md:flex-row md:items-center justify-between bg-white p-5 rounded-xl border border-gray-100 gap-4">
-                            <span class="font-bold text-gray-800">จำนวนที่ต้องการ (ถุง)</span>
-                            <div class="flex items-center justify-center md:justify-end gap-4">
-                                <button type="button" onclick="window.adjustQty(-1)" class="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center font-bold text-xl text-gray-600 transition">-</button>
-                                <input type="number" id="qtyInput" name="sproutQuantity" value="1" min="1" max="9999" class="w-16 text-center font-bold text-2xl text-[#00b900] bg-transparent outline-none">
-                                <button type="button" onclick="window.adjustQty(1)" class="w-10 h-10 rounded-full bg-[#e6f8e6] hover:bg-[#ccf0cc] flex items-center justify-center font-bold text-xl text-[#00b900] transition">+</button>
+                        <div class="mt-6 mx-2 flex flex-col md:flex-row md:items-center justify-between bg-green-50/50 p-5 rounded-2xl border border-green-100 gap-4 shadow-inner">
+                            <div>
+                                <span class="font-bold text-slate-800 text-lg">ระบุจำนวน (ถุง)</span>
+                                <p class="text-sm text-slate-500">เลือกจำนวนที่ต้องการสั่งซื้อ</p>
+                            </div>
+                            <div class="flex items-center justify-center bg-white p-2 rounded-xl shadow-sm border border-slate-100">
+                                <button type="button" onclick="window.adjustQty(-1)" class="w-12 h-12 rounded-lg bg-slate-50 hover:bg-slate-100 flex items-center justify-center font-bold text-2xl text-slate-600 transition active:scale-95">-</button>
+                                <input type="number" id="qtyInput" name="sproutQuantity" value="1" min="1" max="9999" class="w-20 text-center font-extrabold text-3xl text-[#00b900] bg-transparent outline-none">
+                                <button type="button" onclick="window.adjustQty(1)" class="w-12 h-12 rounded-lg bg-green-100 hover:bg-green-200 flex items-center justify-center font-bold text-2xl text-[#00b900] transition active:scale-95">+</button>
                             </div>
                         </div>
                     </div>
 
                     <!-- ส่วนที่ 2: วันที่ต้องการรับสินค้า -->
-                    <div class="mb-8 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                        <h2 class="text-lg font-bold text-gray-800 mb-5 flex items-center gap-3">
-                            <span class="bg-blue-100 text-blue-700 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold">2</span> 
-                            วันที่ต้องการรับสินค้า
+                    <div class="mb-8 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                        <h2 class="text-lg font-bold text-slate-800 mb-5 flex items-center gap-3">
+                            <span class="bg-blue-100 text-blue-700 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shadow-sm">2</span> 
+                            วันที่ต้องการรับของ
                         </h2>
                         
-                        <div class="grid grid-cols-2 gap-3">
+                        <div class="grid grid-cols-2 gap-4">
                             <label class="relative cursor-pointer">
                                 <input type="radio" name="receiveDateType" value="today" class="peer sr-only" checked onchange="window.toggleDatePicker()">
-                                <div class="p-3 rounded-xl border-2 border-gray-100 bg-white peer-checked:border-blue-500 peer-checked:bg-blue-50 hover:bg-gray-50 transition text-center font-semibold text-gray-700">
-                                    รับทันที (วันนี้)
+                                <div class="p-4 rounded-xl border-2 border-slate-100 bg-white peer-checked:border-blue-500 peer-checked:bg-blue-50/50 hover:bg-slate-50 transition text-center flex flex-col items-center justify-center gap-2 h-full">
+                                    <span class="text-2xl">⚡</span>
+                                    <span class="font-bold text-slate-700">รับทันที (วันนี้)</span>
                                 </div>
                             </label>
                             <label class="relative cursor-pointer">
                                 <input type="radio" name="receiveDateType" value="custom" class="peer sr-only" onchange="window.toggleDatePicker()">
-                                <div class="p-3 rounded-xl border-2 border-gray-100 bg-white peer-checked:border-blue-500 peer-checked:bg-blue-50 hover:bg-gray-50 transition text-center font-semibold text-gray-700">
-                                    เลือกวันรับล่วงหน้า
+                                <div class="p-4 rounded-xl border-2 border-slate-100 bg-white peer-checked:border-blue-500 peer-checked:bg-blue-50/50 hover:bg-slate-50 transition text-center flex flex-col items-center justify-center gap-2 h-full">
+                                    <span class="text-2xl">📅</span>
+                                    <span class="font-bold text-slate-700">ระบุวันล่วงหน้า</span>
                                 </div>
                             </label>
                         </div>
                         
-                        <div id="datePickerContainer" class="mt-4 hidden animate-[fadeIn_0.2s_ease-in-out]">
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">ระบุวันที่ต้องการรับของ:</label>
-                            <input type="date" id="customDateInput" name="customDate" class="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-white font-medium">
+                        <div id="datePickerContainer" class="mt-4 hidden animate-[fadeIn_0.3s_ease-out]">
+                            <label class="block text-sm font-bold text-slate-700 mb-2">เลือกวันที่ต้องการรับของ:</label>
+                            <input type="date" id="customDateInput" name="customDate" class="w-full p-4 border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:ring-0 outline-none bg-slate-50 font-medium text-slate-700 transition">
                         </div>
                     </div>
 
                     <!-- ส่วนที่ 3: ข้อมูลติดต่อและแผนที่จัดส่ง -->
-                    <div class="mb-8 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                        <h2 class="text-lg font-bold text-gray-800 mb-5 flex items-center gap-3">
-                            <span class="bg-orange-100 text-orange-700 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold">3</span> 
+                    <div class="mb-8 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                        <h2 class="text-lg font-bold text-slate-800 mb-5 flex items-center gap-3">
+                            <span class="bg-orange-100 text-orange-600 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shadow-sm">3</span> 
                             ข้อมูลและจุดจัดส่ง
                         </h2>
                         <div class="space-y-4">
                             <div>
-                                <input type="text" name="customerName" placeholder="ชื่อ-นามสกุล / ชื่อร้าน" required class="w-full p-4 border border-gray-200 rounded-xl bg-white focus:ring-2 focus:ring-[#00b900] outline-none">
+                                <input type="text" name="customerName" placeholder="ชื่อ-นามสกุล / ชื่อร้าน" required class="w-full p-4 border-2 border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:border-[#00b900] focus:ring-0 outline-none transition font-medium text-slate-800">
                             </div>
                             <div>
-                                <textarea name="deliveryAddress" placeholder="รายละเอียดที่อยู่ (บ้านเลขที่, ซอย, จุดสังเกต)..." rows="3" required class="w-full p-4 border border-gray-200 rounded-xl bg-white focus:ring-2 focus:ring-[#00b900] outline-none"></textarea>
+                                <textarea name="deliveryAddress" placeholder="รายละเอียดที่อยู่ (บ้านเลขที่, ซอย, จุดสังเกต)..." rows="3" required class="w-full p-4 border-2 border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:border-[#00b900] focus:ring-0 outline-none transition font-medium text-slate-800"></textarea>
                             </div>
                             
                             <!-- ระบบแผนที่ปักหมุด -->
-                            <div class="mt-4 bg-gray-50 p-4 rounded-xl border border-gray-200">
-                                <label class="block text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
-                                    📍 ปักหมุดแผนที่ (เพื่อความแม่นยำ)
+                            <div class="mt-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                                <label class="block text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+                                    📍 ปักหมุดตำแหน่ง (เพื่อความแม่นยำ)
                                 </label>
-                                <button type="button" onclick="window.getCurrentLocation()" class="mb-3 w-full bg-white border border-blue-200 hover:bg-blue-50 text-blue-600 font-semibold py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 transition text-sm shadow-sm">
+                                <button type="button" onclick="window.getCurrentLocation()" class="mb-3 w-full bg-white border-2 border-blue-100 hover:border-blue-300 hover:bg-blue-50 text-blue-600 font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition text-sm shadow-sm">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                                     ดึงตำแหน่งปัจจุบันของฉัน
                                 </button>
-                                <div id="map" class="w-full h-56 rounded-lg border border-gray-300 relative z-0"></div>
-                                <p class="text-xs text-gray-500 mt-2 text-center">*เลื่อนแผนที่และคลิกเพื่อปักหมุดจัดส่ง</p>
+                                <div id="map" class="w-full h-64 rounded-xl border-2 border-slate-200 relative z-0 shadow-inner"></div>
+                                <p class="text-xs text-slate-500 mt-2 text-center">*สามารถใช้นิ้วเลื่อนแผนที่และจิ้มเพื่อเปลี่ยนจุดปักหมุดได้</p>
                                 <input type="hidden" id="gpsLinkInput" name="gpsLink" value="">
                             </div>
                         </div>
                     </div>
 
                     <!-- ปุ่มยืนยัน -->
-                    <button type="submit" class="w-full bg-[#00B900] hover:bg-[#009900] text-white font-bold py-4 rounded-2xl shadow-lg transform transition active:scale-95 flex items-center justify-center gap-2 text-lg">
-                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M22.5 12.2c0-5.8-5-10.4-11.2-10.4S0 6.4 0 12.2c0 5.2 3.9 9.5 9 10.3v-3.8H6.3v-3.5H9v-2.6c0-2.6 1.6-4.1 4-4.1 1.1 0 2.3.2 2.3.2v2.5h-1.3c-1.3 0-1.7.8-1.7 1.6v2.4h2.9l-.5 3.5h-2.4v3.8c5.1-.8 9-5.1 9-10.3z"/></svg>
-                        ยืนยันการสั่งซื้อทาง LINE
-                    </button>
+                    <div class="sticky bottom-4 z-40 px-2 md:px-0">
+                        <button type="submit" class="w-full bg-[#00B900] hover:bg-[#009900] text-white font-bold py-4 rounded-2xl shadow-[0_10px_20px_-10px_rgba(0,185,0,0.5)] transform transition hover:-translate-y-1 active:scale-[0.98] flex items-center justify-center gap-3 text-xl border-b-4 border-green-700">
+                            <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M22.5 12.2c0-5.8-5-10.4-11.2-10.4S0 6.4 0 12.2c0 5.2 3.9 9.5 9 10.3v-3.8H6.3v-3.5H9v-2.6c0-2.6 1.6-4.1 4-4.1 1.1 0 2.3.2 2.3.2v2.5h-1.3c-1.3 0-1.7.8-1.7 1.6v2.4h2.9l-.5 3.5h-2.4v3.8c5.1-.8 9-5.1 9-10.3z"/></svg>
+                            ยืนยันและส่งเข้า LINE
+                        </button>
+                    </div>
                 </form>
             </div>
 
             <!-- ========================================== -->
             <!-- 🔍 หน้าติดตามสถานะ (Tracking Page) -->
             <!-- ========================================== -->
-            <div class="tab-content p-5 md:p-8 bg-gray-50/50 md:rounded-b-3xl" id="track-page">
+            <div class="tab-content p-5 md:p-10 bg-slate-50/30 md:rounded-b-[2rem]" id="track-page">
                 <div class="max-w-md mx-auto">
-                    <div class="text-center mb-6">
-                        <h2 class="text-2xl font-bold text-gray-800">ติดตามสถานะพัสดุ</h2>
-                        <p class="text-gray-500 mt-1 text-sm">กรอกชื่อที่ใช้สั่งซื้อเพื่อดูสถานะล่าสุด</p>
+                    <div class="text-center mb-8">
+                        <div class="w-16 h-16 bg-blue-100 text-blue-500 rounded-full flex items-center justify-center text-3xl mx-auto mb-4 shadow-sm">📦</div>
+                        <h2 class="text-2xl font-bold text-slate-800">ติดตามสถานะพัสดุ</h2>
+                        <p class="text-slate-500 mt-2 text-sm">กรอกชื่อที่ใช้สั่งซื้อเพื่อดูสถานะล่าสุดของออเดอร์</p>
                     </div>
-                    <div class="flex gap-2 mb-6 shadow-sm">
-                        <input type="text" id="searchNameInput" placeholder="ใส่ชื่อลูกค้า..." class="flex-1 p-3.5 border border-gray-200 rounded-xl bg-white outline-none focus:ring-2 focus:ring-[#00b900]">
-                        <button onclick="window.searchTracking()" class="bg-[#00b900] text-white px-6 py-3.5 rounded-xl font-bold hover:bg-[#009900] transition">ค้นหา</button>
+                    <div class="flex gap-2 mb-6 shadow-sm bg-white p-2 rounded-2xl border border-slate-100">
+                        <input type="text" id="searchNameInput" placeholder="พิมพ์ชื่อของคุณที่นี่..." class="flex-1 p-3 bg-transparent outline-none text-slate-700 font-medium pl-4">
+                        <button onclick="window.searchTracking()" class="bg-[#00b900] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#009900] transition shadow-md">ค้นหาเลย</button>
                     </div>
-                    <div id="trackingResult" class="hidden bg-white border border-gray-100 shadow-sm rounded-2xl p-6 max-h-[500px] overflow-y-auto">
+                    <div id="trackingResult" class="hidden bg-transparent max-h-[500px] overflow-y-auto space-y-4 pb-10">
                         <!-- ผลลัพธ์ -->
                     </div>
                 </div>
@@ -194,81 +263,84 @@
             <!-- ========================================== -->
             <!-- 📊 หน้าหลังบ้าน (Admin Dashboard) -->
             <!-- ========================================== -->
-            <div class="tab-content p-5 md:p-8 bg-gray-50/50 md:rounded-b-3xl" id="admin-page">
+            <div class="tab-content p-5 md:p-8 bg-slate-50/30 md:rounded-b-[2rem]" id="admin-page">
                 
                 <!-- ฟอร์มล็อกอิน -->
-                <div id="adminLoginBox" class="flex flex-col items-center justify-center py-10 max-w-sm mx-auto">
-                    <div class="w-16 h-16 bg-white shadow-sm border border-gray-100 rounded-full flex items-center justify-center mb-4 text-3xl">🔐</div>
-                    <h2 class="text-xl font-bold text-gray-800 mb-1">เฉพาะเจ้าหน้าที่</h2>
-                    <p class="text-sm text-gray-500 mb-6">กรุณาใส่รหัสผ่านเพื่อเข้าดูระบบหลังบ้าน</p>
+                <div id="adminLoginBox" class="flex flex-col items-center justify-center py-12 max-w-sm mx-auto">
+                    <div class="w-20 h-20 bg-white shadow-md border border-slate-100 rounded-full flex items-center justify-center mb-6 text-4xl">🔐</div>
+                    <h2 class="text-2xl font-bold text-slate-800 mb-2">เฉพาะเจ้าหน้าที่</h2>
+                    <p class="text-slate-500 mb-8 text-center">กรุณาใส่รหัสผ่านเพื่อเข้าดูระบบหลังบ้าน</p>
                     
-                    <div class="flex gap-2 w-full">
-                        <input type="password" id="adminPasswordInput" placeholder="รหัสผ่าน..." class="flex-1 p-3.5 border border-gray-200 rounded-xl bg-white outline-none focus:ring-2 focus:ring-[#00b900] text-center tracking-widest font-bold">
-                        <button onclick="window.loginAdmin()" class="bg-gray-800 hover:bg-gray-900 text-white px-6 py-3.5 rounded-xl font-bold transition">เข้าสู่ระบบ</button>
+                    <div class="flex flex-col gap-3 w-full">
+                        <input type="password" id="adminPasswordInput" placeholder="กรอกรหัสผ่าน..." class="w-full p-4 border-2 border-slate-200 rounded-xl bg-white outline-none focus:border-slate-800 text-center tracking-[0.5em] font-bold text-xl">
+                        <button onclick="window.loginAdmin()" class="bg-slate-800 hover:bg-slate-900 text-white w-full py-4 rounded-xl font-bold transition shadow-lg text-lg">เข้าสู่ระบบ</button>
                     </div>
-                    <p id="adminErrorText" class="text-red-500 text-sm mt-3 hidden bg-red-50 p-2 rounded-lg w-full text-center">❌ รหัสผ่านไม่ถูกต้อง</p>
+                    <p id="adminErrorText" class="text-red-500 text-sm mt-4 hidden bg-red-50 border border-red-100 p-3 rounded-xl w-full text-center font-bold">❌ รหัสผ่านไม่ถูกต้อง กรุณาลองใหม่</p>
                 </div>
 
                 <!-- เนื้อหาหลังบ้าน -->
                 <div id="adminDashboardContent" class="hidden">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-                        <h2 class="text-2xl font-bold text-gray-800">ระบบจัดการหลังบ้าน</h2>
-                        <div class="flex gap-4 items-center bg-white p-2 rounded-lg shadow-sm border border-gray-100">
-                            <button onclick="window.logoutAdmin()" class="text-gray-600 text-sm hover:text-gray-900 font-bold border-r pr-4 border-gray-200">ออกจากระบบ</button>
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                        <h2 class="text-2xl font-bold text-slate-800 flex items-center gap-3">
+                            <span class="bg-slate-800 text-white p-2 rounded-lg text-sm">Admin</span> 
+                            ระบบจัดการหลังบ้าน
+                        </h2>
+                        <div class="flex gap-4 items-center bg-white p-2 rounded-xl shadow-sm border border-slate-200">
+                            <button onclick="window.logoutAdmin()" class="text-slate-600 text-sm hover:text-slate-900 font-bold border-r pr-4 border-slate-200">ออกจากระบบ</button>
                             <button onclick="window.clearAllOrders()" class="text-red-500 text-sm hover:text-red-700 font-bold px-2">ล้างข้อมูลทั้งหมด</button>
                         </div>
                     </div>
 
-                    <div class="flex gap-2 mb-6 bg-gray-200 p-1 rounded-xl w-full max-w-sm">
-                        <button onclick="window.switchAdminTab('list')" id="btnAdminList" class="flex-1 py-2 bg-white shadow-sm text-[#00b900] font-bold rounded-lg transition-all text-sm">📋 ออเดอร์</button>
-                        <button onclick="window.switchAdminTab('report')" id="btnAdminReport" class="flex-1 py-2 text-gray-600 hover:text-gray-800 font-bold rounded-lg transition-all text-sm">📊 รายงาน</button>
+                    <div class="flex gap-2 mb-6 bg-slate-200/50 p-1.5 rounded-2xl w-full max-w-sm mx-auto md:mx-0">
+                        <button onclick="window.switchAdminTab('list')" id="btnAdminList" class="flex-1 py-2.5 bg-white shadow-sm text-[#00b900] font-bold rounded-xl transition-all text-sm">📋 รายการออเดอร์</button>
+                        <button onclick="window.switchAdminTab('report')" id="btnAdminReport" class="flex-1 py-2.5 text-slate-500 hover:text-slate-800 font-bold rounded-xl transition-all text-sm">📊 สรุปรายงาน</button>
                     </div>
 
                     <!-- 1. ส่วนแสดงรายการสั่งซื้อ -->
                     <div id="adminListView">
-                        <div id="productionSummary" class="mb-6 grid grid-cols-2 md:grid-cols-4 gap-4"></div>
-                        <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm bg-white">
+                        <div id="productionSummary" class="mb-8 grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+                        <div class="overflow-x-auto rounded-2xl border border-slate-200 shadow-sm bg-white">
                             <table class="w-full text-sm text-left">
-                                <thead class="bg-gray-50 text-gray-600 border-b border-gray-200">
+                                <thead class="bg-slate-50 text-slate-600 border-b border-slate-200">
                                     <tr>
-                                        <th class="p-4 font-bold">ลูกค้า / วันรับของ</th>
-                                        <th class="p-4 font-bold">รายการ</th>
-                                        <th class="p-4 font-bold">สถานะ</th>
+                                        <th class="p-4 font-bold whitespace-nowrap">ลูกค้า / วันรับของ</th>
+                                        <th class="p-4 font-bold">รายการสินค้า</th>
+                                        <th class="p-4 font-bold text-center">สถานะ</th>
                                         <th class="p-4 font-bold text-center">จัดการ</th>
                                     </tr>
                                 </thead>
-                                <tbody id="ordersTableBody" class="divide-y divide-gray-100"></tbody>
+                                <tbody id="ordersTableBody" class="divide-y divide-slate-100"></tbody>
                             </table>
                         </div>
                     </div>
 
                     <!-- 2. ส่วนแสดงรายงานสรุป -->
                     <div id="adminReportView" class="hidden space-y-6">
-                        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-                            <h3 class="font-bold text-lg text-gray-800 mb-4 flex items-center gap-2">🔍 สรุปยอดสั่งซื้อรายบุคคล</h3>
-                            <div class="flex gap-2 mb-5">
-                                <input type="text" id="reportSearchName" placeholder="พิมพ์ชื่อลูกค้า..." class="flex-1 p-3 border border-gray-200 bg-gray-50 rounded-xl outline-none focus:ring-2 focus:ring-[#00b900]">
-                                <button onclick="window.generateCustomerReport()" class="bg-gray-800 hover:bg-gray-900 text-white px-6 py-3 rounded-xl font-bold transition">ค้นหา</button>
+                        <div class="bg-white p-6 md:p-8 rounded-3xl border border-slate-100 shadow-sm">
+                            <h3 class="font-bold text-lg text-slate-800 mb-5 flex items-center gap-2">🔍 ตรวจสอบยอดซื้อรายบุคคล</h3>
+                            <div class="flex flex-col md:flex-row gap-3 mb-6">
+                                <input type="text" id="reportSearchName" placeholder="พิมพ์ชื่อลูกค้า..." class="flex-1 p-4 border-2 border-slate-100 bg-slate-50 rounded-xl outline-none focus:border-slate-800 transition font-medium">
+                                <button onclick="window.generateCustomerReport()" class="bg-slate-800 hover:bg-slate-900 text-white px-8 py-4 rounded-xl font-bold transition shadow-md">ค้นหาประวัติ</button>
                             </div>
-                            <div id="customerReportResult" class="hidden grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+                            <div id="customerReportResult" class="hidden grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-50 p-6 rounded-2xl border border-slate-100"></div>
                         </div>
 
-                        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-                            <h3 class="font-bold text-lg text-gray-800 mb-4 flex items-center gap-2">🏆 ลูกค้าที่สั่งซื้อสูงสุด 5 อันดับ</h3>
-                            <div class="flex flex-col md:flex-row gap-3 mb-5 bg-gray-50 p-4 rounded-xl border border-gray-100">
+                        <div class="bg-white p-6 md:p-8 rounded-3xl border border-slate-100 shadow-sm">
+                            <h3 class="font-bold text-lg text-slate-800 mb-5 flex items-center gap-2">🏆 ลูกค้าที่มียอดสั่งซื้อสูงสุด (Top 5)</h3>
+                            <div class="flex flex-col md:flex-row gap-4 mb-6 bg-slate-50 p-5 rounded-2xl border border-slate-100">
                                 <div class="flex-1">
-                                    <label class="block text-xs text-gray-500 mb-1 font-bold">ตั้งแต่วันที่</label>
-                                    <input type="date" id="reportStartDate" class="w-full p-2.5 border border-gray-200 bg-white rounded-lg outline-none">
+                                    <label class="block text-xs text-slate-500 mb-1.5 font-bold uppercase tracking-wider">ตั้งแต่วันที่</label>
+                                    <input type="date" id="reportStartDate" class="w-full p-3 border-2 border-slate-200 bg-white rounded-xl outline-none focus:border-blue-500">
                                 </div>
                                 <div class="flex-1">
-                                    <label class="block text-xs text-gray-500 mb-1 font-bold">ถึงวันที่</label>
-                                    <input type="date" id="reportEndDate" class="w-full p-2.5 border border-gray-200 bg-white rounded-lg outline-none">
+                                    <label class="block text-xs text-slate-500 mb-1.5 font-bold uppercase tracking-wider">ถึงวันที่</label>
+                                    <input type="date" id="reportEndDate" class="w-full p-3 border-2 border-slate-200 bg-white rounded-xl outline-none focus:border-blue-500">
                                 </div>
                                 <div class="flex items-end">
-                                    <button onclick="window.generateTopCustomersReport()" class="w-full md:w-auto bg-[#00B900] text-white px-6 py-2.5 rounded-lg font-bold transition h-[42px]">ดูอันดับ</button>
+                                    <button onclick="window.generateTopCustomersReport()" class="w-full md:w-auto bg-[#00B900] text-white px-8 py-3.5 rounded-xl font-bold transition shadow-md hover:bg-[#009900]">ดูอันดับ</button>
                                 </div>
                             </div>
-                            <div id="topCustomersResult" class="hidden bg-white rounded-xl border border-gray-200 overflow-hidden"></div>
+                            <div id="topCustomersResult" class="hidden bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm"></div>
                         </div>
                     </div>
 
@@ -278,18 +350,18 @@
     </div>
 
     <!-- Modal แจ้งเตือน -->
-    <div id="globalModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm transition-opacity">
-        <div class="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 transform scale-95 transition-transform">
-            <h3 id="modalTitle" class="text-xl font-bold text-gray-800 mb-2">Title</h3>
-            <p id="modalMessage" class="text-gray-600 mb-6 text-sm whitespace-pre-line leading-relaxed">Message</p>
+    <div id="globalModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm transition-opacity">
+        <div class="bg-white rounded-[2rem] shadow-2xl max-w-sm w-full p-8 transform scale-95 transition-transform">
+            <h3 id="modalTitle" class="text-2xl font-bold text-slate-800 mb-3">Title</h3>
+            <p id="modalMessage" class="text-slate-600 mb-8 text-base whitespace-pre-line leading-relaxed">Message</p>
             <div class="flex justify-end gap-3">
-                <button id="modalCancelBtn" class="px-4 py-2.5 text-gray-500 hover:bg-gray-100 rounded-xl font-bold hidden transition">ยกเลิก</button>
-                <button id="modalOkBtn" class="px-5 py-2.5 bg-[#00b900] hover:bg-[#009900] text-white rounded-xl font-bold transition shadow-md shadow-green-200">ตกลง</button>
+                <button id="modalCancelBtn" class="px-5 py-3 text-slate-500 hover:bg-slate-100 rounded-xl font-bold hidden transition">ยกเลิก</button>
+                <button id="modalOkBtn" class="px-6 py-3 bg-[#00b900] hover:bg-[#009900] text-white rounded-xl font-bold transition shadow-lg shadow-green-200 w-full md:w-auto">ตกลง</button>
             </div>
         </div>
     </div>
 
-    <!-- Firebase Scripts -->
+    <!-- Firebase Scripts (เหมือนเดิม) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
@@ -305,11 +377,10 @@
         let ordersCollectionPath = 'sprout_orders';
         let currentUser = null;
         let allOrdersMemory = []; 
-        let isOfflineMode = false; // ตัวแปรสำหรับกรณีที่ Firebase Error
+        let isOfflineMode = false; 
 
-        // ตรวจสอบว่าเป็น Canvas Environment (หน้าพรีวิวนี้) หรือ Environment ของผู้ใช้ (บน GitHub Pages)
+        // Firebase Config
         if (typeof __firebase_config !== 'undefined') {
-            // โหมด Canvas
             const canvasConfig = JSON.parse(__firebase_config);
             app = initializeApp(canvasConfig);
             auth = getAuth(app);
@@ -328,7 +399,6 @@
             };
             initCanvasAuth();
         } else {
-            // โหมดผู้ใช้ (ดึงการตั้งค่า Firebase ของคุณเอง)
             const firebaseConfig = {
                 apiKey: "AIzaSyCjxDsLNZI6DcZL6NLTEC_nG3Abq5X_fmY",
                 authDomain: "farmai-fb834.firebaseapp.com",
@@ -342,18 +412,9 @@
             auth = getAuth(app);
             db = getFirestore(app);
 
-            // ลอง Login แบบไม่ระบุตัวตน (Anonymous)
             signInAnonymously(auth).catch((error) => {
                 console.error("Auth Error:", error);
-                isOfflineMode = true; // เปิดโหมดจำลองเพื่อให้เว็บไม่ค้าง
-
-                // หากพบ Error auth/configuration-not-found หรือ operation-not-allowed
-                if (error.code === 'auth/configuration-not-found' || error.code === 'auth/operation-not-allowed') {
-                    setTimeout(() => {
-                        window.showModal("⚠️ ตั้งค่า Firebase ไม่สมบูรณ์", 
-                        "ตรวจพบว่าโปรเจกต์ Firebase ของคุณยังไม่ได้เปิดใช้งาน Authentication\n\nวิธีแก้ปัญหา (ทำใน Firebase Console):\n1. ไปที่เมนู Authentication ด้านซ้ายมือ\n2. คลิกปุ่ม Get Started\n3. เลือกแท็บ Sign-in method\n4. คลิกที่ตัวเลือก Anonymous (ไม่ระบุตัวตน)\n5. กดสวิตช์ Enable แล้วกด Save\n\n*ระหว่างที่ยังไม่ได้แก้ ระบบจะอยู่ใน 'โหมดจำลอง' (บันทึกลงหน่วยความจำชั่วคราว ไม่ลงฐานข้อมูล) เพื่อให้คุณทดสอบกดเล่นได้ครับ*");
-                    }, 1000);
-                }
+                isOfflineMode = true;
             });
         }
 
@@ -368,7 +429,7 @@
 
         function setupDatabaseListener() {
             if (!currentUser && !isOfflineMode) return;
-            if (isOfflineMode) return; // หากอยู่ในโหมด Offline ไม่ต้องดึงข้อมูล
+            if (isOfflineMode) return; 
 
             const ordersRef = collection(db, ordersCollectionPath);
             onSnapshot(ordersRef, (snapshot) => {
@@ -444,12 +505,12 @@
         window.openTab = function(evt, tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => {
-                el.classList.remove('border-[#00b900]', 'text-[#00b900]');
-                el.classList.add('border-transparent', 'text-gray-500');
+                el.classList.remove('border-[#00b900]', 'text-[#00b900]', 'bg-green-50/50');
+                el.classList.add('border-transparent', 'text-gray-400');
             });
             document.getElementById(tabId).classList.add('active');
-            evt.currentTarget.classList.remove('border-transparent', 'text-gray-500');
-            evt.currentTarget.classList.add('border-[#00b900]', 'text-[#00b900]');
+            evt.currentTarget.classList.remove('border-transparent', 'text-gray-400');
+            evt.currentTarget.classList.add('border-[#00b900]', 'text-[#00b900]', 'bg-green-50/50');
 
             if(tabId === 'admin-page') window.checkAdminAuth();
             if(tabId === 'order-page' && map) setTimeout(() => map.invalidateSize(), 100);
@@ -499,21 +560,19 @@
 
             const lineMsg = `🛒 มีคำสั่งซื้อถั่วงอกใหม่!\n🔖 ออเดอร์: ${orderNum}\n👤 ชื่อ: ${name}\n📅 รับของ: ${receiveDateText}\n📦 รายการ: ขนาด ${size} กก. จำนวน ${qty} ถุง\n⚖️ น้ำหนักรวม: ${orderData.totalWeight} กก.\n📍 ที่อยู่:\n${address}\n🗺 พิกัด: ${gpsLink || 'ไม่ระบุ'}`;
 
-            // หากเกิด Error Firebase ให้ใช้โหมดจำลอง (Offline)
             if (isOfflineMode || (!currentUser && typeof __firebase_config === 'undefined')) {
                 orderData.id = 'temp-' + Date.now();
-                allOrdersMemory.unshift(orderData); // เพิ่มลงใน Memory
+                allOrdersMemory.unshift(orderData); 
                 
                 form.reset(); document.getElementById('datePickerContainer').classList.add('hidden');
                 document.getElementById('customDateInput').required = false;
                 
                 window.open(`https://line.me/R/ti/p/~${YOUR_LINE_ID}?text=${encodeURIComponent(lineMsg)}`, '_blank');
-                window.showModal('สำเร็จ (โหมดจำลอง)!', `บันทึกคำสั่งซื้อเรียบร้อย!\n(หมายเหตุ: ข้อมูลนี้ไม่ได้บันทึกลง Database เนื่องจากตั้งค่า Firebase ยังไม่สมบูรณ์)\n📌 เลขที่ออเดอร์: ${orderNum}`);
+                window.showModal('สำเร็จ (โหมดจำลอง)!', `บันทึกคำสั่งซื้อเรียบร้อย!\n📌 เลขที่ออเดอร์: ${orderNum}`);
                 if (sessionStorage.getItem('isAdminLoggedIn') === 'true') refreshOrdersUI();
                 return;
             }
 
-            // โหมดปกติ (บันทึกลง Firebase)
             try {
                 await addDoc(collection(db, ordersCollectionPath), orderData);
                 
@@ -521,7 +580,7 @@
                 document.getElementById('customDateInput').required = false;
 
                 window.open(`https://line.me/R/ti/p/~${YOUR_LINE_ID}?text=${encodeURIComponent(lineMsg)}`, '_blank');
-                window.showModal('สำเร็จ!', `บันทึกคำสั่งซื้อเรียบร้อย!\n📌 เลขที่ออเดอร์: ${orderNum}`);
+                window.showModal('🎉 สั่งซื้อสำเร็จ!', `บันทึกคำสั่งซื้อของคุณเรียบร้อยแล้ว\n📌 เลขที่ออเดอร์: ${orderNum}`);
             } catch (error) { 
                 console.error(error);
                 window.showModal('เกิดข้อผิดพลาด', 'ไม่สามารถบันทึกข้อมูลลงฐานข้อมูลได้'); 
@@ -535,26 +594,31 @@
 
             const found = allOrdersMemory.filter(o => o.name.toLowerCase().includes(name));
             if(found.length === 0) {
-                resultDiv.innerHTML = `<div class="text-red-500 text-center font-bold">ไม่พบข้อมูลของชื่อ "${name}"</div>`;
+                resultDiv.innerHTML = `<div class="bg-red-50 text-red-500 text-center font-bold p-6 rounded-2xl border border-red-100 shadow-sm">ไม่พบข้อมูลออเดอร์ของชื่อ "${name}"</div>`;
             } else {
-                const statusMap = { 'received': '📥 รับออเดอร์แล้ว', 'producing': '🌱 กำลังผลิต', 'delivering': '🚚 กำลังจัดส่ง', 'delivered': '✅ จัดส่งสำเร็จ' };
-                let html = `<div class="text-sm text-gray-500 mb-4 border-b pb-2">พบ ${found.length} รายการ</div>`;
+                const statusMap = { 
+                    'received': { text: '📥 รับออเดอร์แล้ว', class: 'text-slate-600 bg-slate-100 border-slate-200' },
+                    'producing': { text: '🌱 กำลังผลิต/เพาะปลูก', class: 'text-orange-700 bg-orange-50 border-orange-200' },
+                    'delivering': { text: '🚚 กำลังจัดส่งให้คุณ', class: 'text-blue-700 bg-blue-50 border-blue-200' },
+                    'delivered': { text: '✅ จัดส่งสำเร็จ', class: 'text-[#00b900] bg-green-50 border-green-200' }
+                };
+                let html = `<div class="text-sm font-bold text-slate-500 mb-4 px-2">พบ ${found.length} ออเดอร์</div>`;
                 
                 found.forEach(order => {
-                    const statusColor = order.status === 'delivered' ? 'text-[#00b900] bg-green-50 border-green-200' : 'text-blue-700 bg-blue-50 border-blue-200';
+                    const statusInfo = statusMap[order.status];
                     html += `
-                        <div class="mb-4 bg-white p-4 rounded-xl border border-gray-100 shadow-sm relative">
-                            <div class="flex justify-between items-start mb-2">
+                        <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm relative hover:shadow-md transition">
+                            <div class="flex justify-between items-start mb-4">
                                 <div>
-                                    <h3 class="font-bold text-gray-800">${order.name} <span class="text-xs text-gray-400 font-mono ml-1">${order.orderNumber || ''}</span></h3>
-                                    <p class="text-xs text-gray-500 mt-1">รับของ: <span class="font-bold">${order.receiveDate}</span></p>
+                                    <h3 class="font-bold text-slate-800 text-lg">${order.name} <span class="text-xs text-slate-400 font-mono ml-2 border border-slate-200 px-2 py-0.5 rounded-full">${order.orderNumber || ''}</span></h3>
+                                    <p class="text-sm text-slate-500 mt-1 flex items-center gap-1">📅 วันที่รับของ: <span class="font-bold text-slate-700">${order.receiveDate}</span></p>
                                 </div>
                                 <div class="text-right">
-                                    <div class="font-bold text-[#00b900]">${order.totalWeight} กก.</div>
-                                    <div class="text-[10px] text-gray-400">(${order.size}กก.x${order.quantity})</div>
+                                    <div class="font-extrabold text-[#00b900] text-xl">${order.totalWeight} กก.</div>
+                                    <div class="text-xs text-slate-400 font-medium">(${order.size}กก. x ${order.quantity})</div>
                                 </div>
                             </div>
-                            <div class="px-3 py-2 rounded-lg text-center border font-bold text-sm ${statusColor}">${statusMap[order.status]}</div>
+                            <div class="w-full py-2.5 rounded-xl text-center border font-bold text-sm ${statusInfo.class}">${statusInfo.text}</div>
                         </div>
                     `;
                 });
@@ -587,7 +651,7 @@
             tableBody.innerHTML = ''; 
 
             if(allOrdersMemory.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-gray-400">ยังไม่มีออเดอร์ในระบบ</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="4" class="p-10 text-center text-slate-400 font-medium">ยังไม่มีออเดอร์ในระบบ ณ ตอนนี้</td></tr>`;
                 if(summaryContainer) summaryContainer.innerHTML = ''; return;
             }
 
@@ -601,39 +665,39 @@
             });
 
             if(summaryContainer) {
-                let summaryHtml = `<div class="col-span-full"><h3 class="font-bold text-gray-800 mb-2">🌱 ยอดรอผลิต/จัดส่ง</h3></div>`;
+                let summaryHtml = `<div class="col-span-full"><h3 class="font-bold text-slate-800 mb-2 flex items-center gap-2">🌱 ยอดถั่วงอกรอผลิต/จัดส่ง</h3></div>`;
                 if (totalPending > 0) {
-                    summaryHtml += `<div class="bg-[#e6f8e6] border border-[#b3ebb3] p-4 rounded-xl text-center shadow-sm"><div class="text-sm text-[#008000] font-bold mb-1">ยอดรวมทั้งหมด</div><div class="text-2xl font-bold text-[#00b900]">${totalPending} <span class="text-sm">กก.</span></div></div>`;
+                    summaryHtml += `<div class="bg-gradient-to-br from-green-50 to-green-100 border border-green-200 p-5 rounded-2xl text-center shadow-sm"><div class="text-sm text-green-700 font-bold mb-1">ยอดรวมทั้งหมด</div><div class="text-3xl font-black text-[#00b900]">${totalPending} <span class="text-base font-bold">กก.</span></div></div>`;
                     for (const [date, weight] of Object.entries(productionMap)) {
-                        summaryHtml += `<div class="bg-white border border-gray-100 p-4 rounded-xl text-center shadow-sm"><div class="text-sm text-gray-500 font-bold mb-1">${date}</div><div class="text-xl font-bold text-gray-800">${weight} <span class="text-sm">กก.</span></div></div>`;
+                        summaryHtml += `<div class="bg-white border border-slate-100 p-5 rounded-2xl text-center shadow-sm"><div class="text-sm text-slate-500 font-bold mb-1">${date}</div><div class="text-2xl font-black text-slate-800">${weight} <span class="text-sm font-bold">กก.</span></div></div>`;
                     }
-                } else summaryHtml += `<div class="col-span-full text-sm text-gray-500 bg-gray-50 p-4 rounded-xl text-center">ไม่มีออเดอร์ค้างผลิต 🎉</div>`;
+                } else summaryHtml += `<div class="col-span-full text-sm font-medium text-slate-500 bg-slate-50 p-6 rounded-2xl text-center border border-slate-100">ไม่มีออเดอร์ค้างผลิต สบายใจได้ครับ 🎉</div>`;
                 summaryContainer.innerHTML = summaryHtml;
             }
 
             allOrdersMemory.forEach(order => {
-                const row = document.createElement('tr'); row.className = 'bg-white border-b border-gray-100 hover:bg-gray-50';
+                const row = document.createElement('tr'); row.className = 'bg-white border-b border-slate-100 hover:bg-slate-50 transition';
                 row.innerHTML = `
                     <td class="p-4">
-                        <div class="font-bold text-gray-800">${order.name}</div>
-                        ${order.orderNumber ? `<div class="text-[10px] text-gray-400 font-mono">${order.orderNumber}</div>` : ''}
-                        <div class="text-xs text-blue-600 bg-blue-50 inline-block px-2 py-1 rounded mt-1 border border-blue-100">รับ: ${order.receiveDate}</div>
+                        <div class="font-bold text-slate-800">${order.name}</div>
+                        ${order.orderNumber ? `<div class="text-[10px] text-slate-400 font-mono mt-0.5">${order.orderNumber}</div>` : ''}
+                        <div class="text-xs text-blue-700 bg-blue-50 inline-block px-2.5 py-1 rounded-md mt-2 border border-blue-100 font-semibold">รับ: ${order.receiveDate}</div>
                     </td>
                     <td class="p-4">
-                        <div class="font-medium">${order.size} กก. x ${order.quantity} ถุง</div>
-                        <div class="text-sm font-bold mt-1">รวม: <span class="text-[#00b900]">${order.totalWeight} กก.</span></div>
-                        ${order.gpsLink ? `<a href="${order.gpsLink}" target="_blank" class="text-xs text-blue-500 hover:underline mt-1 block">📍 แผนที่</a>` : ''}
+                        <div class="font-medium text-slate-600">${order.size} กก. x ${order.quantity} ถุง</div>
+                        <div class="text-sm font-bold mt-1 text-slate-800">รวม: <span class="text-[#00b900] text-base">${order.totalWeight} กก.</span></div>
+                        ${order.gpsLink ? `<a href="${order.gpsLink}" target="_blank" class="text-xs text-blue-500 hover:text-blue-700 font-bold flex items-center gap-1 mt-2 bg-white border border-blue-100 w-max px-2 py-1 rounded-md shadow-sm"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>แผนที่</a>` : ''}
                     </td>
                     <td class="p-4">
-                        <select onchange="window.updateStatus('${order.id}', this.value)" class="bg-gray-50 border border-gray-200 rounded-lg p-2 text-sm outline-none focus:ring-1 focus:ring-[#00b900] font-bold text-gray-700 w-full max-w-[100px]">
-                            <option value="received" ${order.status === 'received' ? 'selected' : ''}>📥 รับ</option>
+                        <select onchange="window.updateStatus('${order.id}', this.value)" class="bg-slate-50 border-2 border-slate-200 rounded-xl p-2.5 text-sm outline-none focus:border-[#00b900] font-bold text-slate-700 w-full max-w-[120px] transition cursor-pointer hover:bg-white">
+                            <option value="received" ${order.status === 'received' ? 'selected' : ''}>📥 รับออเดอร์</option>
                             <option value="producing" ${order.status === 'producing' ? 'selected' : ''}>🌱 ผลิต</option>
-                            <option value="delivering" ${order.status === 'delivering' ? 'selected' : ''}>🚚 ส่ง</option>
-                            <option value="delivered" ${order.status === 'delivered' ? 'selected' : ''}>✅ จบ</option>
+                            <option value="delivering" ${order.status === 'delivering' ? 'selected' : ''}>🚚 ส่งของ</option>
+                            <option value="delivered" ${order.status === 'delivered' ? 'selected' : ''}>✅ สำเร็จ</option>
                         </select>
                     </td>
                     <td class="p-4 text-center">
-                        <button onclick="window.deleteOrder('${order.id}')" class="text-red-400 hover:text-red-600 bg-red-50 p-2 rounded-lg transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+                        <button onclick="window.deleteOrder('${order.id}')" class="text-red-400 hover:text-red-600 hover:bg-red-50 p-2.5 rounded-xl transition border border-transparent hover:border-red-100"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
                     </td>
                 `;
                 tableBody.appendChild(row);
@@ -679,12 +743,12 @@
             const btnList = document.getElementById('btnAdminList'); const btnReport = document.getElementById('btnAdminReport');
             const viewList = document.getElementById('adminListView'); const viewReport = document.getElementById('adminReportView');
             if (tab === 'list') {
-                btnList.className = 'flex-1 py-2 bg-white shadow-sm text-[#00b900] font-bold rounded-lg transition-all text-sm';
-                btnReport.className = 'flex-1 py-2 text-gray-600 hover:text-gray-800 font-bold rounded-lg transition-all text-sm';
+                btnList.className = 'flex-1 py-2.5 bg-white shadow-sm text-[#00b900] font-bold rounded-xl transition-all text-sm';
+                btnReport.className = 'flex-1 py-2.5 text-slate-500 hover:text-slate-800 font-bold rounded-xl transition-all text-sm';
                 viewList.classList.remove('hidden'); viewReport.classList.add('hidden');
             } else {
-                btnReport.className = 'flex-1 py-2 bg-white shadow-sm text-[#00b900] font-bold rounded-lg transition-all text-sm';
-                btnList.className = 'flex-1 py-2 text-gray-600 hover:text-gray-800 font-bold rounded-lg transition-all text-sm';
+                btnReport.className = 'flex-1 py-2.5 bg-white shadow-sm text-[#00b900] font-bold rounded-xl transition-all text-sm';
+                btnList.className = 'flex-1 py-2.5 text-slate-500 hover:text-slate-800 font-bold rounded-xl transition-all text-sm';
                 viewReport.classList.remove('hidden'); viewList.classList.add('hidden');
                 if(!document.getElementById('reportStartDate').value) {
                     const today = new Date(); const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -700,7 +764,7 @@
             if (!name) return window.showModal("แจ้งเตือน", "กรุณาพิมพ์ชื่อลูกค้า");
 
             const orders = allOrdersMemory.filter(o => o.name.toLowerCase().includes(name));
-            if (orders.length === 0) { res.innerHTML = `<div class="col-span-3 text-center text-red-500 py-4 font-bold">ไม่พบประวัติ "${name}"</div>`; res.classList.remove('hidden'); return; }
+            if (orders.length === 0) { res.innerHTML = `<div class="col-span-3 text-center text-red-500 py-6 font-bold">ไม่พบประวัติการสั่งซื้อของ "${name}"</div>`; res.classList.remove('hidden'); return; }
 
             const now = new Date(); const todayStr = now.toLocaleDateString('th-TH');
             let stats = { today: { c: 0, w: 0 }, month: { c: 0, w: 0 }, all: { c: 0, w: 0 } };
@@ -713,12 +777,12 @@
             });
 
             res.innerHTML = `
-                <div class="col-span-1 md:col-span-3 pb-2 border-b border-gray-100">
-                    <h4 class="font-bold text-gray-800">สรุปยอด: <span class="text-[#00b900]">${orders[0].name}</span></h4>
+                <div class="col-span-1 md:col-span-3 pb-3 border-b border-slate-200">
+                    <h4 class="font-bold text-slate-800">สรุปยอดของ: <span class="text-[#00b900] text-xl">${orders[0].name}</span></h4>
                 </div>
-                <div class="bg-gray-50 p-4 rounded-xl border border-gray-100 text-center"><div class="text-sm text-gray-500 mb-1 font-bold">ยอดวันนี้</div><div class="text-xl font-bold text-gray-800">${stats.today.w} <span class="text-sm">กก.</span></div></div>
-                <div class="bg-gray-50 p-4 rounded-xl border border-gray-100 text-center"><div class="text-sm text-gray-500 mb-1 font-bold">ยอดเดือนนี้</div><div class="text-xl font-bold text-gray-800">${stats.month.w} <span class="text-sm">กก.</span></div></div>
-                <div class="bg-[#e6f8e6] p-4 rounded-xl border border-[#b3ebb3] text-center"><div class="text-sm text-[#008000] mb-1 font-bold">ยอดรวมทั้งหมด</div><div class="text-2xl font-bold text-[#00b900]">${stats.all.w} <span class="text-base">กก.</span></div></div>
+                <div class="bg-white p-5 rounded-xl border border-slate-100 text-center shadow-sm"><div class="text-sm text-slate-500 mb-1 font-bold">ยอดสั่งวันนี้</div><div class="text-2xl font-black text-slate-800">${stats.today.w} <span class="text-sm font-bold">กก.</span></div></div>
+                <div class="bg-white p-5 rounded-xl border border-slate-100 text-center shadow-sm"><div class="text-sm text-slate-500 mb-1 font-bold">ยอดเดือนนี้</div><div class="text-2xl font-black text-slate-800">${stats.month.w} <span class="text-sm font-bold">กก.</span></div></div>
+                <div class="bg-gradient-to-br from-green-50 to-green-100 p-5 rounded-xl border border-green-200 text-center shadow-sm"><div class="text-sm text-green-700 mb-1 font-bold">ยอดรวมทั้งหมด</div><div class="text-3xl font-black text-[#00b900]">${stats.all.w} <span class="text-base font-bold">กก.</span></div></div>
             `;
             res.classList.remove('hidden');
         };
@@ -731,7 +795,7 @@
             const start = new Date(startVal).setHours(0,0,0,0); const end = new Date(endVal).setHours(23,59,59,999);
             const filtered = allOrdersMemory.filter(o => o.createdAt >= start && o.createdAt <= end);
 
-            if (filtered.length === 0) { res.innerHTML = `<div class="text-center text-gray-500 py-6 font-bold">ไม่มีข้อมูลช่วงเวลานี้</div>`; res.classList.remove('hidden'); return; }
+            if (filtered.length === 0) { res.innerHTML = `<div class="text-center text-slate-500 py-8 font-bold">ไม่มีข้อมูลการสั่งซื้อในช่วงเวลานี้</div>`; res.classList.remove('hidden'); return; }
 
             const map = {};
             filtered.forEach(o => {
@@ -741,10 +805,10 @@
             });
 
             const top5 = Object.values(map).sort((a, b) => b.w - a.w).slice(0, 5);
-            let html = `<table class="w-full text-sm text-left"><thead class="bg-[#00b900] text-white"><tr><th class="p-3 w-16 text-center">อันดับ</th><th class="p-3">ชื่อลูกค้า</th><th class="p-3 text-right">น้ำหนักรวม</th></tr></thead><tbody class="divide-y divide-gray-100">`;
+            let html = `<table class="w-full text-sm text-left"><thead class="bg-slate-800 text-white"><tr><th class="p-4 w-16 text-center">อันดับ</th><th class="p-4">ชื่อลูกค้า</th><th class="p-4 text-right">น้ำหนักรวม</th></tr></thead><tbody class="divide-y divide-slate-100">`;
             const medals = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
             top5.forEach((c, i) => {
-                html += `<tr class="${i < 3 ? 'bg-orange-50/30' : 'bg-white'}"><td class="p-3 text-center text-xl">${medals[i]}</td><td class="p-3 font-bold text-gray-800">${c.name} <span class="text-xs text-gray-400 font-normal ml-1">(${c.c} บิล)</span></td><td class="p-3 text-right font-bold text-[#00b900]">${c.w} กก.</td></tr>`;
+                html += `<tr class="${i === 0 ? 'bg-orange-50/50' : 'bg-white'} hover:bg-slate-50 transition"><td class="p-4 text-center text-2xl">${medals[i]}</td><td class="p-4 font-bold text-slate-800 text-base">${c.name} <span class="text-xs text-slate-400 font-normal ml-2 bg-slate-100 px-2 py-1 rounded-full">${c.c} บิล</span></td><td class="p-4 text-right font-black text-[#00b900] text-lg">${c.w} กก.</td></tr>`;
             });
             res.innerHTML = html + `</tbody></table>`; res.classList.remove('hidden');
         };
