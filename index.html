@@ -219,95 +219,233 @@
                 <!-- เนื้อหาหลังบ้าน (ซ่อนไว้จนกว่าจะล็อกอินผ่าน) -->
                 <div id="adminDashboardContent" class="hidden">
                     <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-bold text-gray-800">รายการสั่งซื้อทั้งหมด</h2>
+                        <h2 class="text-2xl font-bold text-gray-800">ระบบหลังบ้าน</h2>
                         <div class="flex gap-4 items-center">
                             <button onclick="logoutAdmin()" class="text-gray-500 text-sm hover:text-gray-800 font-bold border-r pr-4 border-gray-300">ออกจากระบบ</button>
                             <button onclick="clearAllOrders()" class="text-red-500 text-sm hover:underline">ล้างข้อมูลทั้งหมด</button>
                         </div>
                     </div>
-                    <div class="overflow-x-auto rounded-xl border border-gray-200">
-                        <table class="w-full text-sm text-left">
-                            <thead class="bg-gray-50 text-gray-600">
-                                <tr>
-                                    <th class="p-3">ลูกค้า / วันรับของ</th>
-                                    <th class="p-3">รายการ</th>
-                                    <th class="p-3">สถานะ</th>
-                                    <th class="p-3 text-center">ลบ</th>
-                                </tr>
-                            </thead>
-                            <tbody id="ordersTableBody" class="divide-y divide-gray-100">
-                                <!-- แถวตาราง -->
-                            </tbody>
-                        </table>
+
+                    <!-- เมนูย่อยในหน้าหลังบ้าน -->
+                    <div class="flex gap-2 mb-6 bg-gray-100 p-1 rounded-xl">
+                        <button onclick="switchAdminTab('list')" id="btnAdminList" class="flex-1 py-2 bg-white shadow-sm text-gray-800 font-bold rounded-lg transition-all">📋 รายการสั่งซื้อ</button>
+                        <button onclick="switchAdminTab('report')" id="btnAdminReport" class="flex-1 py-2 text-gray-500 hover:text-gray-800 font-bold rounded-lg transition-all">📊 รายงานสรุป</button>
                     </div>
+
+                    <!-- 1. ส่วนแสดงรายการสั่งซื้อ (Admin List View) -->
+                    <div id="adminListView">
+                        
+                        <!-- เพิ่มส่วนสรุปยอดการผลิตตรงนี้ -->
+                        <div id="productionSummary" class="mb-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <!-- ข้อมูลยอดสรุปจะถูกแทรกที่นี่ด้วย JavaScript -->
+                        </div>
+
+                        <div class="overflow-x-auto rounded-xl border border-gray-200">
+                            <table class="w-full text-sm text-left">
+                                <thead class="bg-gray-50 text-gray-600">
+                                    <tr>
+                                        <th class="p-3">ลูกค้า / วันรับของ</th>
+                                        <th class="p-3">รายการ</th>
+                                        <th class="p-3">สถานะ</th>
+                                        <th class="p-3 text-center">ลบ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ordersTableBody" class="divide-y divide-gray-100">
+                                    <!-- แถวตาราง -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- 2. ส่วนแสดงรายงานสรุป (Admin Report View) -->
+                    <div id="adminReportView" class="hidden space-y-6">
+                        
+                        <!-- 2.1 ค้นหาสรุปยอดรายบุคคล -->
+                        <div class="bg-gray-50 p-5 rounded-2xl border border-gray-200">
+                            <h3 class="font-bold text-lg text-gray-800 mb-3 flex items-center gap-2">
+                                🔍 สรุปยอดสั่งซื้อรายบุคคล
+                            </h3>
+                            <div class="flex gap-2 mb-4">
+                                <input type="text" id="reportSearchName" placeholder="พิมพ์ชื่อลูกค้า..." class="flex-1 p-3 border border-gray-300 bg-white rounded-xl outline-none focus:ring-2 focus:ring-green-500">
+                                <button onclick="generateCustomerReport()" class="bg-gray-800 hover:bg-gray-900 text-white px-5 py-3 rounded-xl font-bold transition">ค้นหา</button>
+                            </div>
+                            <div id="customerReportResult" class="hidden grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <!-- ผลลัพธ์รายบุคคล -->
+                            </div>
+                        </div>
+
+                        <!-- 2.2 จัดอันดับลูกค้า Top 5 -->
+                        <div class="bg-gray-50 p-5 rounded-2xl border border-gray-200">
+                            <h3 class="font-bold text-lg text-gray-800 mb-3 flex items-center gap-2">
+                                🏆 ลูกค้าที่สั่งซื้อสูงสุด 5 อันดับ
+                            </h3>
+                            <div class="flex flex-col md:flex-row gap-3 mb-4">
+                                <div class="flex-1">
+                                    <label class="block text-xs text-gray-500 mb-1 font-bold">ตั้งแต่วันที่</label>
+                                    <input type="date" id="reportStartDate" class="w-full p-3 border border-gray-300 bg-white rounded-xl outline-none focus:ring-2 focus:ring-green-500">
+                                </div>
+                                <div class="flex-1">
+                                    <label class="block text-xs text-gray-500 mb-1 font-bold">ถึงวันที่</label>
+                                    <input type="date" id="reportEndDate" class="w-full p-3 border border-gray-300 bg-white rounded-xl outline-none focus:ring-2 focus:ring-green-500">
+                                </div>
+                                <div class="flex items-end">
+                                    <button onclick="generateTopCustomersReport()" class="w-full md:w-auto bg-[#00B900] hover:bg-[#009900] text-white px-6 py-3 rounded-xl font-bold transition">ดูอันดับ</button>
+                                </div>
+                            </div>
+                            <div id="topCustomersResult" class="hidden bg-white rounded-xl border border-gray-200 overflow-hidden">
+                                <!-- ตารางจัดอันดับ -->
+                            </div>
+                        </div>
+
+                    </div>
+
                 </div> <!-- ปิด div adminDashboardContent -->
             </div>
 
         </div>
     </div>
 
-    <script>
+    <!-- แจ้งเตือน Modal (แทน Alert กวนใจของเบราว์เซอร์) -->
+    <div id="globalModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm transition-opacity">
+        <div class="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 transform scale-95 transition-transform">
+            <h3 id="modalTitle" class="text-xl font-bold text-gray-800 mb-2">Title</h3>
+            <p id="modalMessage" class="text-gray-600 mb-6 text-sm">Message</p>
+            <div class="flex justify-end gap-3">
+                <button id="modalCancelBtn" class="px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-lg font-medium hidden">ยกเลิก</button>
+                <button id="modalOkBtn" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium">ตกลง</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- เปลี่ยนระบบ Script เป็นแบบ Module เพื่อใช้ Cloud Database -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
         // ----------------------------------------------------
-        // ตั้งค่า LINE ID ของคุณตรงนี้!
+        // ตั้งค่า LINE ID และรหัสผ่านของคุณตรงนี้!
         // ----------------------------------------------------
         const YOUR_LINE_ID = "@yourlineid"; 
-        
-        const STORAGE_KEY = 'sprout_orders_v3';
-        const ADMIN_PASSWORD = '1234'; // <--- ตั้งรหัสผ่านสำหรับเข้าหลังบ้านตรงนี้ครับ (แก้ตัวเลขได้เลย)
+        const ADMIN_PASSWORD = '1234'; 
+
+        // การตั้งค่า Cloud Database (เชื่อมโยงให้อัตโนมัติ)
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
         let map, marker;
+        let currentUser = null;
+        let allOrdersMemory = []; 
 
-        // ตั้งค่าปฏิทินให้เลือกได้ตั้งแต่วันพรุ่งนี้เป็นต้นไป และเริ่มแผนที่
+        // เริ่มต้นระบบระบุตัวตน (เพื่อความปลอดภัยของฐานข้อมูล)
+        const initAuth = async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch(e) { console.error('Auth error', e); }
+        };
+        initAuth();
+
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            if (user) {
+                setupDatabaseListener();
+            }
+        });
+
+        // ดึงข้อมูลแบบ Real-time จากระบบคลาวด์
+        function setupDatabaseListener() {
+            if (!currentUser) return;
+            const ordersRef = collection(db, 'artifacts', appId, 'public', 'data', 'sprout_orders');
+            
+            onSnapshot(ordersRef, (snapshot) => {
+                allOrdersMemory = [];
+                snapshot.forEach(doc => {
+                    allOrdersMemory.push({ id: doc.id, ...doc.data() });
+                });
+                
+                // เรียงออเดอร์จากใหม่สุดไปเก่าสุด
+                allOrdersMemory.sort((a, b) => b.createdAt - a.createdAt);
+
+                // อัปเดตตารางและหน้าติดตามแบบเรียลไทม์
+                if (sessionStorage.getItem('isAdminLoggedIn') === 'true') refreshOrdersUI();
+                if (document.getElementById('track-page').classList.contains('active')) window.searchTracking();
+                
+            }, (error) => console.error("Snapshot error:", error));
+        }
+
+        // เริ่มต้นแผนที่และวันที่
         window.addEventListener('load', () => {
             const dateInput = document.getElementById('customDateInput');
             const today = new Date();
             const tomorrow = new Date(today);
             tomorrow.setDate(tomorrow.getDate() + 1);
             dateInput.min = tomorrow.toISOString().split('T')[0];
-            
-            refreshOrders();
             initMap();
         });
 
-        // ฟังก์ชันสร้างและจัดการแผนที่ปักหมุด
+        // ----------------------------------------------------
+        // UI Modals แทน alert() และ confirm()
+        // ----------------------------------------------------
+        window.showModal = function(title, message, onOk = null) {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalMessage').innerText = message;
+            document.getElementById('modalCancelBtn').classList.add('hidden');
+            const okBtn = document.getElementById('modalOkBtn');
+            okBtn.onclick = () => {
+                document.getElementById('globalModal').classList.add('hidden');
+                if(onOk) onOk();
+            };
+            document.getElementById('globalModal').classList.remove('hidden');
+        };
+
+        window.showConfirm = function(title, message, onConfirm) {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalMessage').innerText = message;
+            const cancelBtn = document.getElementById('modalCancelBtn');
+            cancelBtn.classList.remove('hidden');
+            cancelBtn.onclick = () => document.getElementById('globalModal').classList.add('hidden');
+            const okBtn = document.getElementById('modalOkBtn');
+            okBtn.onclick = () => {
+                document.getElementById('globalModal').classList.add('hidden');
+                onConfirm();
+            };
+            document.getElementById('globalModal').classList.remove('hidden');
+        };
+
+        // ----------------------------------------------------
+        // MAP FUNCTIONS
+        // ----------------------------------------------------
         function initMap() {
-            // พิกัดเริ่มต้น (ตัวอย่าง: อนุสาวรีย์ชัยฯ กรุงเทพฯ)
             const defaultLat = 13.7649;
             const defaultLng = 100.5383;
-
             map = L.map('map').setView([defaultLat, defaultLng], 13);
-
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap'
-            }).addTo(map);
-
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
             marker = L.marker([defaultLat, defaultLng], {draggable: true}).addTo(map);
             updateGpsLink(defaultLat, defaultLng);
 
-            // คลิกเพื่อย้ายหมุด
             map.on('click', function(e) {
                 marker.setLatLng(e.latlng);
                 updateGpsLink(e.latlng.lat, e.latlng.lng);
             });
-
-            // ลากหมุดเพื่อเปลี่ยนตำแหน่ง
             marker.on('dragend', function(e) {
                 const position = marker.getLatLng();
                 updateGpsLink(position.lat, position.lng);
             });
-            
-            // ป้องกันแผนที่เทาเวลาอยู่หน้า Tab ที่ซ่อนอยู่
             setTimeout(() => { map.invalidateSize(); }, 500);
         }
 
-        // อัปเดตลิงก์ Google Maps ลง Input 
         function updateGpsLink(lat, lng) {
-            const link = `https://www.google.com/maps?q=${lat},${lng}`;
-            document.getElementById('gpsLinkInput').value = link;
+            document.getElementById('gpsLinkInput').value = `https://www.google.com/maps?q=${lat},${lng}`;
         }
 
-        // ดึงตำแหน่งปัจจุบันของอุปกรณ์
-        function getCurrentLocation() {
+        window.getCurrentLocation = function() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
@@ -317,17 +455,17 @@
                         marker.setLatLng([lat, lng]);
                         updateGpsLink(lat, lng);
                     },
-                    (error) => {
-                        alert("ไม่สามารถเข้าถึงตำแหน่งได้ กรุณากดอนุญาตหรือลากหมุดบนแผนที่เองครับ");
-                    }
+                    (error) => window.showModal("แจ้งเตือน", "ไม่สามารถเข้าถึงตำแหน่งได้ กรุณาลากหมุดบนแผนที่เองครับ")
                 );
             } else {
-                alert("เบราว์เซอร์ของคุณไม่รองรับการระบุตำแหน่ง");
+                window.showModal("แจ้งเตือน", "เบราว์เซอร์ของคุณไม่รองรับการระบุตำแหน่ง");
             }
-        }
+        };
 
-        // สลับหน้าจอ Tabs
-        function openTab(evt, tabId) {
+        // ----------------------------------------------------
+        // CORE LOGIC & ORDERING
+        // ----------------------------------------------------
+        window.openTab = function(evt, tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => {
                 el.classList.remove('border-green-600', 'text-green-700', 'bg-green-50/50');
@@ -339,59 +477,22 @@
             btn.classList.remove('border-transparent', 'text-gray-400');
             btn.classList.add('border-green-600', 'text-green-700', 'bg-green-50/50');
 
-            if(tabId === 'admin-page') {
-                checkAdminAuth();
-            }
-            
-            // รีเฟรชแผนที่เมื่อเปิดกลับมาหน้าสั่งซื้อ
-            if(tabId === 'order-page' && map) {
-                setTimeout(() => map.invalidateSize(), 100);
-            }
-        }
+            if(tabId === 'admin-page') window.checkAdminAuth();
+            if(tabId === 'order-page' && map) setTimeout(() => map.invalidateSize(), 100);
+        };
 
-        // --- ระบบล็อกอินหน้าหลังบ้าน ---
-        function checkAdminAuth() {
-            const isLoggedIn = sessionStorage.getItem('isAdminLoggedIn') === 'true';
-            if (isLoggedIn) {
-                document.getElementById('adminLoginBox').classList.add('hidden');
-                document.getElementById('adminDashboardContent').classList.remove('hidden');
-                refreshOrders();
-            } else {
-                document.getElementById('adminLoginBox').classList.remove('hidden');
-                document.getElementById('adminDashboardContent').classList.add('hidden');
-            }
-        }
-
-        function loginAdmin() {
-            const pass = document.getElementById('adminPasswordInput').value;
-            if (pass === ADMIN_PASSWORD) {
-                sessionStorage.setItem('isAdminLoggedIn', 'true');
-                document.getElementById('adminPasswordInput').value = '';
-                document.getElementById('adminErrorText').classList.add('hidden');
-                checkAdminAuth();
-            } else {
-                document.getElementById('adminErrorText').classList.remove('hidden');
-            }
-        }
-
-        function logoutAdmin() {
-            sessionStorage.removeItem('isAdminLoggedIn');
-            checkAdminAuth();
-        }
-
-        function adjustQty(change) {
+        window.adjustQty = function(change) {
             const input = document.getElementById('qtyInput');
             let val = parseInt(input.value) + change;
             if (val < 1) val = 1;
             if (val > 9999) val = 9999;
             input.value = val;
-        }
+        };
 
-        function toggleDatePicker() {
+        window.toggleDatePicker = function() {
             const isCustom = document.querySelector('input[name="receiveDateType"]:checked').value === 'custom';
             const container = document.getElementById('datePickerContainer');
             const input = document.getElementById('customDateInput');
-            
             if (isCustom) {
                 container.classList.remove('hidden');
                 input.required = true;
@@ -400,11 +501,25 @@
                 input.required = false;
                 input.value = ''; 
             }
+        };
+
+        // ฟังก์ชันสุ่มเลขที่ออเดอร์ (รูปแบบ: ORDปีเดือนวัน-สุ่ม4หลัก)
+        function generateOrderNumber() {
+            const date = new Date();
+            const yy = String(date.getFullYear()).slice(-2);
+            const mm = String(date.getMonth() + 1).padStart(2, '0');
+            const dd = String(date.getDate()).padStart(2, '0');
+            const random = Math.floor(1000 + Math.random() * 9000); 
+            return `ORD${yy}${mm}${dd}-${random}`;
         }
 
-        // จัดการส่งออเดอร์
-        function handleOrderSubmit(event) {
+        window.handleOrderSubmit = async function(event) {
             event.preventDefault();
+            if (!currentUser) {
+                window.showModal("รอสักครู่", "ระบบกำลังเชื่อมต่อฐานข้อมูล กรุณารอสักครู่แล้วกดอีกครั้ง");
+                return;
+            }
+
             const form = event.target;
             const formData = new FormData(form);
 
@@ -412,20 +527,22 @@
             const qty = parseInt(formData.get('sproutQuantity'));
             const name = formData.get('customerName').trim();
             const address = formData.get('deliveryAddress').trim();
-            const gpsLink = formData.get('gpsLink').trim(); // ดึงค่าลิงก์ GPS ที่ลูกค้ากรอก
+            const gpsLink = formData.get('gpsLink').trim(); 
             
-            const dateType = formData.get('receiveDateType');
             let receiveDateText = "รับทันที (วันนี้)";
-            
-            if (dateType === 'custom') {
+            if (formData.get('receiveDateType') === 'custom') {
                 const rawDate = formData.get('customDate');
                 const [year, month, day] = rawDate.split('-');
                 receiveDateText = `วันที่ ${day}/${month}/${year}`;
             }
 
-            const order = {
-                id: Date.now(),
-                timestamp: new Date().toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' }),
+            const orderNum = generateOrderNumber(); // สร้างเลขที่ออเดอร์
+
+            // จัดเตรียมข้อมูลส่งขึ้น Cloud
+            const orderData = {
+                orderNumber: orderNum,
+                createdAt: Date.now(), 
+                timestampText: new Date().toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' }),
                 name: name,
                 size: size,
                 quantity: qty,
@@ -433,112 +550,42 @@
                 address: address,
                 gpsLink: gpsLink,
                 receiveDate: receiveDateText,
-                status: 'received'
+                status: 'received',
+                userId: currentUser.uid
             };
 
-            // บันทึกลงระบบหลังบ้าน
-            const orders = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-            orders.push(order);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
+            try {
+                // บันทึกลงฐานข้อมูล
+                const ordersRef = collection(db, 'artifacts', appId, 'public', 'data', 'sprout_orders');
+                await addDoc(ordersRef, orderData);
 
-            // สร้างข้อความส่งเข้า LINE (เพิ่มลิงก์พิกัดไปด้วย)
-            const lineMessage = `🛒 มีคำสั่งซื้อถั่วงอกใหม่!\n`
-                              + `👤 ชื่อ: ${name}\n`
-                              + `📅 วันที่รับของ: ${receiveDateText}\n`
-                              + `📦 รายการ: ขนาด ${size} กก. จำนวน ${qty} ถุง\n`
-                              + `⚖️ น้ำหนักรวม: ${order.totalWeight} กก.\n`
-                              + `📍 ที่อยู่จัดส่ง:\n${address}\n`
-                              + `🗺 พิกัด GPS: ${gpsLink ? gpsLink : 'ไม่ระบุ'}`;
-            
-            const encodedMessage = encodeURIComponent(lineMessage);
-            const lineUrl = `https://line.me/R/ti/p/~${YOUR_LINE_ID}?text=${encodedMessage}`;
+                // สร้างข้อความเปิด LINE
+                const lineMessage = `🛒 มีคำสั่งซื้อถั่วงอกใหม่!\n🔖 เลขที่ออเดอร์: ${orderNum}\n👤 ชื่อ: ${name}\n📅 วันที่รับของ: ${receiveDateText}\n📦 รายการ: ขนาด ${size} กก. จำนวน ${qty} ถุง\n⚖️ น้ำหนักรวม: ${orderData.totalWeight} กก.\n📍 ที่อยู่จัดส่ง:\n${address}\n🗺 พิกัด GPS: ${gpsLink ? gpsLink : 'ไม่ระบุ'}`;
+                const encodedMessage = encodeURIComponent(lineMessage);
+                
+                form.reset();
+                document.getElementById('datePickerContainer').classList.add('hidden');
+                document.getElementById('customDateInput').required = false;
 
-            form.reset();
-            document.getElementById('datePickerContainer').classList.add('hidden');
-            document.getElementById('customDateInput').required = false;
+                window.open(`https://line.me/R/ti/p/~${YOUR_LINE_ID}?text=${encodedMessage}`, '_blank');
+                window.showModal('สำเร็จ!', `บันทึกคำสั่งซื้อเข้าสู่ระบบคลาวด์เรียบร้อยแล้ว!\n\n📌 เลขที่ออเดอร์ของคุณคือ:\n${orderNum}`);
 
-            window.open(lineUrl, '_blank');
-            alert('บันทึกคำสั่งซื้อเรียบร้อย! ระบบกำลังพาท่านไปที่ LINE เพื่อยืนยันกับร้านค้า');
-        }
-
-        // ระบบหลังบ้าน
-        function refreshOrders() {
-            const tableBody = document.getElementById('ordersTableBody');
-            const orders = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-            tableBody.innerHTML = ''; 
-
-            if(orders.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="4" class="p-5 text-center text-gray-400">ยังไม่มีออเดอร์</td></tr>`;
-                return;
+            } catch (error) {
+                console.error("Error saving:", error);
+                window.showModal('เกิดข้อผิดพลาด', 'ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่อีกครั้ง');
             }
+        };
 
-            orders.reverse().forEach(order => {
-                const row = document.createElement('tr');
-                row.className = 'bg-white border-b';
-                row.innerHTML = `
-                    <td class="p-3">
-                        <div class="font-bold text-gray-800">${order.name}</div>
-                        <div class="text-xs text-blue-600 bg-blue-50 inline-block px-2 py-1 rounded mt-1">📅 รับ: ${order.receiveDate}</div>
-                        <div class="text-xs text-gray-400 mt-1">สั่งเมื่อ: ${order.timestamp}</div>
-                    </td>
-                    <td class="p-3">
-                        <div>${order.size} กก. x ${order.quantity} ถุง</div>
-                        <div class="text-xs text-gray-500 font-bold mt-1">รวม: ${order.totalWeight} กก.</div>
-                        ${order.gpsLink ? `<a href="${order.gpsLink}" target="_blank" class="text-xs text-blue-500 hover:underline mt-1 block">📍 ดูแผนที่จัดส่ง</a>` : ''}
-                    </td>
-                    <td class="p-3">
-                        <select onchange="updateStatus(${order.id}, this.value)" class="bg-gray-50 border rounded p-1 text-sm outline-none">
-                            <option value="received" ${order.status === 'received' ? 'selected' : ''}>📥 รับคำสั่งซื้อ</option>
-                            <option value="producing" ${order.status === 'producing' ? 'selected' : ''}>🌱 กำลังผลิต</option>
-                            <option value="delivering" ${order.status === 'delivering' ? 'selected' : ''}>🚚 กำลังขนส่ง</option>
-                            <option value="delivered" ${order.status === 'delivered' ? 'selected' : ''}>✅ เรียบร้อย</option>
-                        </select>
-                    </td>
-                    <td class="p-3 text-center">
-                        <button onclick="deleteOrder(${order.id})" class="text-red-400 hover:text-red-600">ลบ</button>
-                    </td>
-                `;
-                tableBody.appendChild(row);
-            });
-        }
-
-        function updateStatus(id, newStatus) {
-            let orders = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-            const index = orders.findIndex(o => o.id === id);
-            if (index !== -1) {
-                orders[index].status = newStatus;
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
-            }
-        }
-
-        function deleteOrder(id) {
-            if(confirm('ต้องการลบออเดอร์นี้ใช่หรือไม่?')) {
-                let orders = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-                orders = orders.filter(o => o.id !== id);
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
-                refreshOrders();
-            }
-        }
-
-        function clearAllOrders() {
-            if(confirm('ลบข้อมูลออเดอร์ทั้งหมดอย่างถาวร?')) {
-                localStorage.removeItem(STORAGE_KEY);
-                refreshOrders();
-            }
-        }
-
-        function searchTracking() {
+        window.searchTracking = function() {
             const name = document.getElementById('searchNameInput').value.trim().toLowerCase();
             const resultDiv = document.getElementById('trackingResult');
             if(!name) return;
 
-            const orders = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-            const found = orders.filter(o => o.name.toLowerCase().includes(name));
+            const found = allOrdersMemory.filter(o => o.name.toLowerCase().includes(name));
 
             if(found.length === 0) {
                 resultDiv.innerHTML = `<div class="text-red-500 text-center">ไม่พบข้อมูลของชื่อนี้</div>`;
             } else {
-                const latest = found[found.length - 1];
                 const statusMap = {
                     'received': '📥 ทางร้านได้รับคำสั่งซื้อแล้ว',
                     'producing': '🌱 กำลังทำการเพาะปลูก/บรรจุ',
@@ -546,19 +593,390 @@
                     'delivered': '✅ จัดส่งถึงมือเรียบร้อยแล้ว'
                 };
                 
-                resultDiv.innerHTML = `
-                    <div class="border-b pb-4 mb-4">
-                        <h3 class="font-bold text-lg text-gray-800">คุณ ${latest.name}</h3>
-                        <p class="text-gray-500 text-sm mt-1">วันที่ต้องการรับ: <span class="text-blue-600 font-bold">${latest.receiveDate}</span></p>
-                    </div>
-                    <div class="bg-blue-50 p-4 rounded-xl text-center">
-                        <div class="text-sm text-blue-600 mb-1">สถานะปัจจุบัน</div>
-                        <div class="font-bold text-xl text-blue-800">${statusMap[latest.status] || 'กำลังดำเนินการ'}</div>
-                    </div>
-                `;
+                let html = `<div class="text-sm text-gray-500 mb-4 border-b pb-2 flex justify-between items-center">
+                                <span>พบประวัติการสั่งซื้อ ${found.length} รายการ</span>
+                            </div>`;
+                
+                found.forEach(order => {
+                    // จัดการออเดอร์เก่าที่อาจจะยังไม่มีเลขที่ออเดอร์
+                    const orderNumText = order.orderNumber ? `<span class="bg-blue-50 text-blue-700 px-2 py-0.5 rounded text-xs ml-2 font-mono border border-blue-200">🔖 ${order.orderNumber}</span>` : '';
+                    
+                    html += `
+                        <div class="mb-5 last:mb-0 bg-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm relative overflow-hidden">
+                            <div class="flex justify-between items-start mb-3 relative z-10">
+                                <div>
+                                    <h3 class="font-bold text-lg text-gray-800 flex items-center flex-wrap gap-1">
+                                        คุณ ${order.name} ${orderNumText}
+                                    </h3>
+                                    <p class="text-gray-500 text-sm mt-1">วันที่ต้องการรับ: <span class="text-blue-600 font-bold">${order.receiveDate}</span></p>
+                                    <p class="text-xs text-gray-400 mt-1">สั่งเมื่อ: ${order.timestampText}</p>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-base font-bold text-green-700">${order.totalWeight} กก.</div>
+                                    <div class="text-xs text-gray-500">(${order.size}กก. x ${order.quantity})</div>
+                                </div>
+                            </div>
+                            <div class="bg-white p-3 rounded-lg text-center border border-gray-200 shadow-sm relative z-10">
+                                <div class="text-xs text-gray-500 mb-1">สถานะปัจจุบัน</div>
+                                <div class="font-bold text-base ${order.status === 'delivered' ? 'text-green-600' : 'text-blue-600'}">${statusMap[order.status] || 'กำลังดำเนินการ'}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                resultDiv.innerHTML = html;
             }
             resultDiv.classList.remove('hidden');
+        };
+
+        // ----------------------------------------------------
+        // ADMIN FUNCTIONS
+        // ----------------------------------------------------
+        window.checkAdminAuth = function() {
+            if (sessionStorage.getItem('isAdminLoggedIn') === 'true') {
+                document.getElementById('adminLoginBox').classList.add('hidden');
+                document.getElementById('adminDashboardContent').classList.remove('hidden');
+                refreshOrdersUI();
+            } else {
+                document.getElementById('adminLoginBox').classList.remove('hidden');
+                document.getElementById('adminDashboardContent').classList.add('hidden');
+            }
+        };
+
+        window.loginAdmin = function() {
+            if (document.getElementById('adminPasswordInput').value === ADMIN_PASSWORD) {
+                sessionStorage.setItem('isAdminLoggedIn', 'true');
+                document.getElementById('adminPasswordInput').value = '';
+                document.getElementById('adminErrorText').classList.add('hidden');
+                window.checkAdminAuth();
+            } else {
+                document.getElementById('adminErrorText').classList.remove('hidden');
+            }
+        };
+
+        window.logoutAdmin = function() {
+            sessionStorage.removeItem('isAdminLoggedIn');
+            window.checkAdminAuth();
+        };
+
+        function refreshOrdersUI() {
+            const tableBody = document.getElementById('ordersTableBody');
+            const summaryContainer = document.getElementById('productionSummary');
+            tableBody.innerHTML = ''; 
+
+            if(allOrdersMemory.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="4" class="p-5 text-center text-gray-400">ยังไม่มีออเดอร์</td></tr>`;
+                if(summaryContainer) summaryContainer.innerHTML = '';
+                return;
+            }
+
+            // --- คำนวณยอดเตรียมผลิต (เฉพาะที่ยังไม่จัดส่ง) ---
+            const productionMap = {};
+            let totalPending = 0;
+            
+            allOrdersMemory.forEach(order => {
+                // นับเฉพาะสถานะที่เพิ่งรับออเดอร์ หรือ กำลังผลิต
+                if (order.status === 'received' || order.status === 'producing') {
+                    const dateKey = order.receiveDate;
+                    const weight = parseFloat(order.totalWeight) || 0;
+                    if (!productionMap[dateKey]) productionMap[dateKey] = 0;
+                    productionMap[dateKey] += weight;
+                    totalPending += weight;
+                }
+            });
+
+            // --- แสดงผล Card สรุปยอด ---
+            if(summaryContainer) {
+                let summaryHtml = `
+                    <div class="col-span-full">
+                        <h3 class="font-bold text-gray-800 flex items-center gap-2 mb-2">
+                            🌱 สรุปยอดรอผลิต/จัดส่ง (เพื่อวางแผนการผลิต)
+                        </h3>
+                    </div>
+                `;
+
+                if (totalPending > 0) {
+                    // Card รวมทั้งหมด
+                    summaryHtml += `
+                        <div class="bg-green-50 border border-green-200 p-4 rounded-xl text-center shadow-sm">
+                            <div class="text-sm text-green-700 font-bold mb-1">ยอดรอส่งรวมทั้งหมด</div>
+                            <div class="text-2xl font-bold text-green-800">${totalPending} <span class="text-sm">กก.</span></div>
+                        </div>
+                    `;
+                    // Card แยกตามวัน
+                    for (const [date, weight] of Object.entries(productionMap)) {
+                        summaryHtml += `
+                            <div class="bg-white border border-gray-200 p-4 rounded-xl text-center shadow-sm">
+                                <div class="text-sm text-gray-600 font-bold mb-1">${date}</div>
+                                <div class="text-xl font-bold text-gray-800">${weight} <span class="text-sm">กก.</span></div>
+                            </div>
+                        `;
+                    }
+                } else {
+                    summaryHtml += `<div class="col-span-full text-sm text-gray-500 bg-gray-50 p-4 rounded-xl text-center border border-gray-100">เคลียร์ออเดอร์หมดแล้ว ไม่มีค้างผลิต 🎉</div>`;
+                }
+                summaryContainer.innerHTML = summaryHtml;
+            }
+
+            // --- สร้างตารางรายการสั่งซื้อ ---
+            allOrdersMemory.forEach(order => {
+                const row = document.createElement('tr');
+                row.className = 'bg-white border-b hover:bg-gray-50 transition-colors';
+                
+                const orderNumDisplay = order.orderNumber ? `<div class="text-xs text-gray-500 font-mono mt-1 bg-gray-100 inline-block px-1 rounded border">🔖 ${order.orderNumber}</div>` : '';
+
+                row.innerHTML = `
+                    <td class="p-3">
+                        <div class="font-bold text-gray-800">${order.name}</div>
+                        ${orderNumDisplay}
+                        <div class="text-xs text-blue-600 bg-blue-50 inline-block px-2 py-1 rounded mt-1">📅 รับ: ${order.receiveDate}</div>
+                        <div class="text-xs text-gray-400 mt-1">สั่งเมื่อ: ${order.timestampText}</div>
+                    </td>
+                    <td class="p-3">
+                        <div>${order.size} กก. x ${order.quantity} ถุง</div>
+                        <div class="text-xs text-gray-500 font-bold mt-1">รวม: <span class="text-green-600">${order.totalWeight} กก.</span></div>
+                        ${order.gpsLink ? `<a href="${order.gpsLink}" target="_blank" class="text-xs text-blue-500 hover:underline mt-1 block">📍 ดูแผนที่จัดส่ง</a>` : ''}
+                    </td>
+                    <td class="p-3">
+                        <select onchange="window.updateStatus('${order.id}', this.value)" class="bg-gray-50 border border-gray-300 rounded-lg p-1.5 text-sm outline-none focus:ring-2 focus:ring-green-500">
+                            <option value="received" ${order.status === 'received' ? 'selected' : ''}>📥 รับ</option>
+                            <option value="producing" ${order.status === 'producing' ? 'selected' : ''}>🌱 ผลิต</option>
+                            <option value="delivering" ${order.status === 'delivering' ? 'selected' : ''}>🚚 ขนส่ง</option>
+                            <option value="delivered" ${order.status === 'delivered' ? 'selected' : ''}>✅ จบ</option>
+                        </select>
+                    </td>
+                    <td class="p-3 text-center">
+                        <button onclick="window.deleteOrder('${order.id}')" class="text-red-400 hover:text-red-600">ลบ</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
         }
+
+        window.updateStatus = async function(id, newStatus) {
+            if (!currentUser) return;
+            try {
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'sprout_orders', id);
+                await updateDoc(docRef, { status: newStatus });
+            } catch(error) { console.error("Update error", error); }
+        };
+
+        window.deleteOrder = async function(id) {
+            if (!currentUser) return;
+            window.showConfirm('ลบข้อมูล', 'ต้องการลบออเดอร์นี้ใช่หรือไม่?', async () => {
+                try {
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'sprout_orders', id);
+                    await deleteDoc(docRef);
+                } catch(error) { console.error("Delete error", error); }
+            });
+        };
+
+        window.clearAllOrders = async function() {
+            if (!currentUser) return;
+            window.showConfirm('ลบข้อมูลทั้งหมด', 'ลบข้อมูลออเดอร์ทั้งหมดอย่างถาวร?', async () => {
+                try {
+                    for (const order of allOrdersMemory) {
+                        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'sprout_orders', order.id);
+                        await deleteDoc(docRef);
+                    }
+                } catch(error) { console.error("Clear error", error); }
+            });
+        };
+
+        // ----------------------------------------------------
+        // REPORTING FUNCTIONS (ระบบรายงาน)
+        // ----------------------------------------------------
+        window.switchAdminTab = function(tab) {
+            const btnList = document.getElementById('btnAdminList');
+            const btnReport = document.getElementById('btnAdminReport');
+            const viewList = document.getElementById('adminListView');
+            const viewReport = document.getElementById('adminReportView');
+
+            if (tab === 'list') {
+                btnList.className = 'flex-1 py-2 bg-white shadow-sm text-gray-800 font-bold rounded-lg transition-all';
+                btnReport.className = 'flex-1 py-2 text-gray-500 hover:text-gray-800 font-bold rounded-lg transition-all';
+                viewList.classList.remove('hidden');
+                viewReport.classList.add('hidden');
+            } else {
+                btnReport.className = 'flex-1 py-2 bg-white shadow-sm text-gray-800 font-bold rounded-lg transition-all';
+                btnList.className = 'flex-1 py-2 text-gray-500 hover:text-gray-800 font-bold rounded-lg transition-all';
+                viewReport.classList.remove('hidden');
+                viewList.classList.add('hidden');
+                
+                // ตั้งค่าเริ่มต้นของวันที่สำหรับ Top 5 เป็นต้นเดือนจนถึงวันนี้
+                if(!document.getElementById('reportStartDate').value) {
+                    const today = new Date();
+                    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+                    
+                    // ปรับ format ให้เข้ากับ input type="date" (YYYY-MM-DD)
+                    const formatDate = (date) => {
+                        const d = new Date(date);
+                        let month = '' + (d.getMonth() + 1);
+                        let day = '' + d.getDate();
+                        const year = d.getFullYear();
+                        if (month.length < 2) month = '0' + month;
+                        if (day.length < 2) day = '0' + day;
+                        return [year, month, day].join('-');
+                    };
+
+                    document.getElementById('reportStartDate').value = formatDate(firstDay);
+                    document.getElementById('reportEndDate').value = formatDate(today);
+                }
+            }
+        };
+
+        window.generateCustomerReport = function() {
+            const searchName = document.getElementById('reportSearchName').value.trim().toLowerCase();
+            const resultDiv = document.getElementById('customerReportResult');
+            
+            if (!searchName) {
+                window.showModal("แจ้งเตือน", "กรุณาพิมพ์ชื่อลูกค้าที่ต้องการค้นหา");
+                return;
+            }
+
+            // ค้นหาออเดอร์ของชื่อนี้
+            const customerOrders = allOrdersMemory.filter(o => o.name.toLowerCase().includes(searchName));
+
+            if (customerOrders.length === 0) {
+                resultDiv.innerHTML = `<div class="col-span-3 text-center text-red-500 py-4">ไม่พบประวัติการสั่งซื้อของชื่อ "${searchName}"</div>`;
+                resultDiv.classList.remove('hidden');
+                return;
+            }
+
+            const now = new Date();
+            const todayStr = now.toLocaleDateString('th-TH');
+            const currentMonth = now.getMonth();
+            const currentYear = now.getFullYear();
+
+            let stats = {
+                today: { count: 0, weight: 0 },
+                month: { count: 0, weight: 0 },
+                allTime: { count: 0, weight: 0 }
+            };
+
+            customerOrders.forEach(o => {
+                const orderDate = new Date(o.createdAt);
+                const weight = parseFloat(o.totalWeight) || 0;
+                
+                // ยอดทั้งหมด
+                stats.allTime.count++;
+                stats.allTime.weight += weight;
+
+                // ยอดวันนี้
+                if (orderDate.toLocaleDateString('th-TH') === todayStr) {
+                    stats.today.count++;
+                    stats.today.weight += weight;
+                }
+
+                // ยอดเดือนนี้
+                if (orderDate.getMonth() === currentMonth && orderDate.getFullYear() === currentYear) {
+                    stats.month.count++;
+                    stats.month.weight += weight;
+                }
+            });
+
+            // ใช้ชื่อจริงจากออเดอร์ล่าสุดเพื่อแสดงผล
+            const displayName = customerOrders[0].name;
+
+            resultDiv.innerHTML = `
+                <div class="col-span-1 md:col-span-3 pb-2 border-b border-gray-200">
+                    <h4 class="font-bold text-gray-800">สรุปยอดคุณ: <span class="text-green-600">${displayName}</span></h4>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm text-center">
+                    <div class="text-sm text-gray-500 mb-1">ยอดวันนี้</div>
+                    <div class="text-xl font-bold text-gray-800">${stats.today.weight} <span class="text-sm">กก.</span></div>
+                    <div class="text-xs text-gray-400 mt-1">${stats.today.count} รายการ</div>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm text-center">
+                    <div class="text-sm text-gray-500 mb-1">ยอดเดือนนี้</div>
+                    <div class="text-xl font-bold text-gray-800">${stats.month.weight} <span class="text-sm">กก.</span></div>
+                    <div class="text-xs text-gray-400 mt-1">${stats.month.count} รายการ</div>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-green-200 bg-green-50 shadow-sm text-center relative overflow-hidden">
+                    <div class="absolute -right-4 -top-4 w-16 h-16 bg-green-100 rounded-full opacity-50"></div>
+                    <div class="text-sm text-green-700 mb-1 font-bold relative z-10">ยอดรวมทั้งหมด</div>
+                    <div class="text-2xl font-bold text-green-800 relative z-10">${stats.allTime.weight} <span class="text-base">กก.</span></div>
+                    <div class="text-xs text-green-600 mt-1 relative z-10">${stats.allTime.count} รายการ</div>
+                </div>
+            `;
+            resultDiv.classList.remove('hidden');
+        };
+
+        window.generateTopCustomersReport = function() {
+            const startDateVal = document.getElementById('reportStartDate').value;
+            const endDateVal = document.getElementById('reportEndDate').value;
+            const resultDiv = document.getElementById('topCustomersResult');
+
+            if (!startDateVal || !endDateVal) {
+                window.showModal("แจ้งเตือน", "กรุณาเลือกช่วงเวลาให้ครบถ้วน");
+                return;
+            }
+
+            const start = new Date(startDateVal);
+            start.setHours(0, 0, 0, 0);
+            
+            const end = new Date(endDateVal);
+            end.setHours(23, 59, 59, 999);
+
+            // คัดกรองออเดอร์ตามช่วงเวลา
+            const filteredOrders = allOrdersMemory.filter(o => {
+                return o.createdAt >= start.getTime() && o.createdAt <= end.getTime();
+            });
+
+            if (filteredOrders.length === 0) {
+                resultDiv.innerHTML = `<div class="text-center text-gray-500 py-6">ไม่มีข้อมูลการสั่งซื้อในช่วงเวลานี้</div>`;
+                resultDiv.classList.remove('hidden');
+                return;
+            }
+
+            // คำนวณรวมยอดรายบุคคล
+            const customerMap = {};
+            filteredOrders.forEach(o => {
+                const name = o.name.trim();
+                const key = name.toLowerCase(); // จัดกลุ่มโดยไม่สนตัวพิมพ์เล็ก-ใหญ่
+                if (!customerMap[key]) {
+                    customerMap[key] = { name: name, totalWeight: 0, orderCount: 0 };
+                }
+                customerMap[key].totalWeight += (parseFloat(o.totalWeight) || 0);
+                customerMap[key].orderCount++;
+            });
+
+            // แปลงเป็น Array แล้วเรียงลำดับตามน้ำหนักรวมมากไปน้อย นำมาแค่ 5 อันดับแรก
+            const sortedCustomers = Object.values(customerMap)
+                .sort((a, b) => b.totalWeight - a.totalWeight)
+                .slice(0, 5);
+
+            let tableHtml = `
+                <table class="w-full text-sm text-left">
+                    <thead class="bg-green-50 text-green-800">
+                        <tr>
+                            <th class="p-3 w-16 text-center">อันดับ</th>
+                            <th class="p-3">ชื่อลูกค้า</th>
+                            <th class="p-3 text-right">จำนวนครั้ง</th>
+                            <th class="p-3 text-right">น้ำหนักรวม</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+            `;
+
+            const medals = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
+
+            sortedCustomers.forEach((c, index) => {
+                tableHtml += `
+                    <tr class="${index < 3 ? 'bg-orange-50/20' : 'bg-white'} hover:bg-gray-50 transition-colors">
+                        <td class="p-3 text-center text-xl">${medals[index]}</td>
+                        <td class="p-3 font-bold text-gray-800">${c.name}</td>
+                        <td class="p-3 text-right text-gray-500">${c.orderCount}</td>
+                        <td class="p-3 text-right font-bold text-green-700">${c.totalWeight} กก.</td>
+                    </tr>
+                `;
+            });
+
+            tableHtml += `</tbody></table>`;
+            resultDiv.innerHTML = tableHtml;
+            resultDiv.classList.remove('hidden');
+        };
+
     </script>
 </body>
 </html>
