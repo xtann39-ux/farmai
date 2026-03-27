@@ -6,6 +6,11 @@
     <title>ระบบสั่งซื้อถั่วงอก - ฟาร์มงอกเงย</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- เพิ่ม Leaflet.js สำหรับแผนที่ปักหมุดจัดส่ง -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
     <style>
         body { font-family: 'Prompt', sans-serif; background-color: #f8fafc; }
         .tab-content { display: none; }
@@ -133,40 +138,37 @@
                         </div>
                     </div>
 
-                    <!-- ส่วนที่ 3: ข้อมูลติดต่อ -->
-                    <div class="mb-8">
+                    <!-- ส่วนที่ 3: ข้อมูลติดต่อและแผนที่จัดส่ง -->
+                    <div class="mb-8 bg-gray-50 p-5 rounded-2xl border border-gray-100">
                         <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
                             <span class="bg-orange-100 text-orange-700 w-8 h-8 rounded-full flex items-center justify-center text-sm">3</span> 
-                            ข้อมูลลูกค้าจัดส่ง
+                            ข้อมูลลูกค้าและจุดจัดส่ง
                         </h2>
                         <div class="space-y-4">
                             <div>
-                                <input type="text" name="customerName" placeholder="ชื่อ-นามสกุล / ชื่อร้าน" required class="w-full p-4 border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-green-500 outline-none">
+                                <input type="text" name="customerName" placeholder="ชื่อ-นามสกุล / ชื่อร้าน" required class="w-full p-4 border border-gray-200 rounded-xl bg-white focus:ring-2 focus:ring-green-500 outline-none">
                             </div>
                             <div>
-                                <textarea name="deliveryAddress" placeholder="ที่อยู่จัดส่งโดยละเอียด..." rows="3" required class="w-full p-4 border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-green-500 outline-none"></textarea>
+                                <textarea name="deliveryAddress" placeholder="รายละเอียดที่อยู่ (บ้านเลขที่, ซอย, จุดสังเกต)..." rows="3" required class="w-full p-4 border border-gray-200 rounded-xl bg-white focus:ring-2 focus:ring-green-500 outline-none"></textarea>
                             </div>
-                            <div>
-                                <input type="text" name="gpsLink" placeholder="วางลิงก์ Google Maps พิกัดบ้าน/ร้านคุณ (ถ้ามี)" class="w-full p-4 border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-green-500 outline-none">
-                                <p class="text-xs text-gray-400 mt-1 ml-2">*ช่วยให้ไรเดอร์ของเราไปส่งได้แม่นยำและรวดเร็วขึ้นครับ</p>
+                            
+                            <!-- ระบบแผนที่ปักหมุด -->
+                            <div class="mt-4 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                                <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                                    <svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path></svg>
+                                    ปักหมุดแผนที่ (เพื่อความแม่นยำในการจัดส่ง)
+                                </label>
+                                <button type="button" onclick="getCurrentLocation()" class="mb-3 w-full bg-blue-50 hover:bg-blue-100 text-blue-600 font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition text-sm">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                    ใช้ตำแหน่งปัจจุบันของฉัน
+                                </button>
+                                <!-- Map Container -->
+                                <div id="map" class="w-full h-56 rounded-lg border border-gray-300 relative z-0"></div>
+                                <p class="text-xs text-gray-500 mt-2 text-center">*คลิกบนแผนที่หรือลากหมุด เพื่อระบุพิกัดจัดส่งของคุณ</p>
+                                <!-- ซ่อน Input ที่เก็บลิงก์ Google Maps -->
+                                <input type="hidden" id="gpsLinkInput" name="gpsLink" value="">
                             </div>
                         </div>
-                    </div>
-
-                    <!-- ส่วนที่ 4: แผนที่ร้าน / พิกัดฟาร์ม (กลับมาแล้ว!) -->
-                    <div class="mb-8 bg-gray-50 p-5 rounded-2xl border border-gray-100">
-                        <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                            <span class="bg-purple-100 text-purple-700 w-8 h-8 rounded-full flex items-center justify-center text-sm">
-                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path></svg>
-                            </span> 
-                            พิกัดส่งของ
-                        </h2>
-                        <!-- กล่องแผนที่ Google Maps -->
-                        <div class="w-full h-48 md:h-64 rounded-xl overflow-hidden border border-gray-200 shadow-inner">
-                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15502.5855799971!2d100.51869824999999!3d13.73976375!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30e299292db21c51%3A0xe2125ce01db320de!2sBangkok!5e0!3m2!1sen!2sth!4v1700000000000!5m2!1sen!2sth" 
-                                    width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-                        </div>
-                        <p class="text-sm text-gray-500 mt-3 text-center">ลูกค้าสามารถมารับเองที่ฟาร์มได้ตามแผนที่นี้เลยครับ</p>
                     </div>
 
                     <!-- ปุ่มยืนยัน -->
@@ -231,7 +233,9 @@
         
         const STORAGE_KEY = 'sprout_orders_v3';
 
-        // ตั้งค่าปฏิทินให้เลือกได้ตั้งแต่วันพรุ่งนี้เป็นต้นไป
+        let map, marker;
+
+        // ตั้งค่าปฏิทินให้เลือกได้ตั้งแต่วันพรุ่งนี้เป็นต้นไป และเริ่มแผนที่
         window.addEventListener('load', () => {
             const dateInput = document.getElementById('customDateInput');
             const today = new Date();
@@ -240,7 +244,65 @@
             dateInput.min = tomorrow.toISOString().split('T')[0];
             
             refreshOrders();
+            initMap();
         });
+
+        // ฟังก์ชันสร้างและจัดการแผนที่ปักหมุด
+        function initMap() {
+            // พิกัดเริ่มต้น (ตัวอย่าง: อนุสาวรีย์ชัยฯ กรุงเทพฯ)
+            const defaultLat = 13.7649;
+            const defaultLng = 100.5383;
+
+            map = L.map('map').setView([defaultLat, defaultLng], 13);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap'
+            }).addTo(map);
+
+            marker = L.marker([defaultLat, defaultLng], {draggable: true}).addTo(map);
+            updateGpsLink(defaultLat, defaultLng);
+
+            // คลิกเพื่อย้ายหมุด
+            map.on('click', function(e) {
+                marker.setLatLng(e.latlng);
+                updateGpsLink(e.latlng.lat, e.latlng.lng);
+            });
+
+            // ลากหมุดเพื่อเปลี่ยนตำแหน่ง
+            marker.on('dragend', function(e) {
+                const position = marker.getLatLng();
+                updateGpsLink(position.lat, position.lng);
+            });
+            
+            // ป้องกันแผนที่เทาเวลาอยู่หน้า Tab ที่ซ่อนอยู่
+            setTimeout(() => { map.invalidateSize(); }, 500);
+        }
+
+        // อัปเดตลิงก์ Google Maps ลง Input 
+        function updateGpsLink(lat, lng) {
+            const link = `https://www.google.com/maps?q=${lat},${lng}`;
+            document.getElementById('gpsLinkInput').value = link;
+        }
+
+        // ดึงตำแหน่งปัจจุบันของอุปกรณ์
+        function getCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        map.setView([lat, lng], 16);
+                        marker.setLatLng([lat, lng]);
+                        updateGpsLink(lat, lng);
+                    },
+                    (error) => {
+                        alert("ไม่สามารถเข้าถึงตำแหน่งได้ กรุณากดอนุญาตหรือลากหมุดบนแผนที่เองครับ");
+                    }
+                );
+            } else {
+                alert("เบราว์เซอร์ของคุณไม่รองรับการระบุตำแหน่ง");
+            }
+        }
 
         // สลับหน้าจอ Tabs
         function openTab(evt, tabId) {
@@ -256,6 +318,11 @@
             btn.classList.add('border-green-600', 'text-green-700', 'bg-green-50/50');
 
             if(tabId === 'admin-page') refreshOrders();
+            
+            // รีเฟรชแผนที่เมื่อเปิดกลับมาหน้าสั่งซื้อ
+            if(tabId === 'order-page' && map) {
+                setTimeout(() => map.invalidateSize(), 100);
+            }
         }
 
         function adjustQty(change) {
@@ -419,7 +486,7 @@
                 const latest = found[found.length - 1];
                 const statusMap = {
                     'received': '📥 ทางร้านได้รับคำสั่งซื้อแล้ว',
-                    'producing': '🌱 กำลังบรรจุ',
+                    'producing': '🌱 กำลังทำการเพาะปลูก/บรรจุ',
                     'delivering': '🚚 กำลังเดินทางไปส่งให้คุณ',
                     'delivered': '✅ จัดส่งถึงมือเรียบร้อยแล้ว'
                 };
