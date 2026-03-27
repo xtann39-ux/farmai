@@ -43,10 +43,11 @@
                  class="absolute inset-0 w-full h-full object-cover opacity-20 mix-blend-overlay" alt="Farm background">
             
             <div class="relative z-10 flex flex-col md:flex-row items-center gap-5 max-w-2xl mx-auto md:mx-0 text-center md:text-left">
-                <!-- รูปภาพโลโก้สินค้า (เปลี่ยนลิงก์เป็นรูปของคุณ เช่น src="./page.png") -->
+                <!-- โลโก้แบรนด์ (ดึงจาก Github หรือไฟล์ Local) -->
                 <div class="relative">
-                    <img src="https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?auto=format&fit=crop&q=80&w=200" 
-                         class="w-24 h-24 md:w-28 md:h-28 rounded-full border-4 border-white shadow-lg object-cover bg-white" alt="โลโก้ฟาร์มงอกเงย">
+                    <img src="https://raw.githubusercontent.com/xtann39-ux/farmai/main/brand.jfif" 
+                         onerror="this.src='./brand.jfif'"
+                         class="w-24 h-24 md:w-28 md:h-28 rounded-full border-4 border-white shadow-lg object-contain bg-white p-1" alt="โลโก้ฟาร์มงอกเงย">
                     <div class="absolute -bottom-2 -right-2 bg-yellow-400 text-yellow-900 text-xs font-bold px-3 py-1 rounded-full shadow-md border-2 border-white">
                         ออร์แกนิก 100%
                     </div>
@@ -96,17 +97,18 @@
                             <label class="relative cursor-pointer group">
                                 <input type="radio" name="sproutSize" value="1" class="peer sr-only">
                                 <div class="rounded-2xl border-2 border-slate-100 bg-white overflow-hidden peer-checked:border-[#00b900] peer-checked:bg-green-50/20 transition-all shadow-sm group-hover:shadow-md h-full flex flex-col relative">
-                                    <!-- เปลี่ยนรูปสินค้า 1 กก. ได้ที่นี่ -->
-                                    <div class="relative h-40 overflow-hidden bg-slate-100">
-                                        <img src="https://images.unsplash.com/photo-1598514982205-f36b96d1e8d4?auto=format&fit=crop&q=80&w=400" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="ถั่วงอก 1 กก.">
-                                        <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+                                    <div class="relative h-48 md:h-40 overflow-hidden bg-slate-100">
+                                        <!-- รูปสินค้า ถุงเล็ก -->
+                                        <img src="https://raw.githubusercontent.com/xtann39-ux/farmai/main/product.jpg" 
+                                             onerror="this.src='./product.jpg'"
+                                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="ถั่วงอก 1 กก.">
+                                        <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
                                         <div class="absolute bottom-2 left-3 text-white font-bold text-sm">แพ็คประหยัด</div>
                                     </div>
                                     <div class="p-4 flex flex-col flex-1 justify-center text-center">
                                         <div class="font-bold text-slate-700 text-lg">ถุงเล็ก (ทดลอง)</div>
                                         <div class="text-[#00b900] font-extrabold text-2xl mt-1">1 กก.</div>
                                     </div>
-                                    <!-- ไอคอนติ๊กถูก (จะโผล่เมื่อเลือก) -->
                                     <div class="absolute top-3 right-3 bg-[#00b900] text-white rounded-full p-1 opacity-0 peer-checked:opacity-100 transition-opacity shadow-md transform scale-50 peer-checked:scale-100 duration-200">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                                     </div>
@@ -116,13 +118,14 @@
                             <!-- สินค้า 2: ถุงกลาง -->
                             <label class="relative cursor-pointer group">
                                 <input type="radio" name="sproutSize" value="5" class="peer sr-only" checked>
-                                <!-- โบว์แนะนำ -->
                                 <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-red-500 text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-md z-10 whitespace-nowrap tracking-wide">ขายดีที่สุด 🔥</div>
                                 <div class="rounded-2xl border-2 border-slate-100 bg-white overflow-hidden peer-checked:border-[#00b900] peer-checked:bg-green-50/20 transition-all shadow-sm group-hover:shadow-md h-full flex flex-col relative">
-                                    <!-- เปลี่ยนรูปสินค้า 5 กก. ได้ที่นี่ -->
-                                    <div class="relative h-40 overflow-hidden bg-slate-100">
-                                        <img src="https://images.unsplash.com/photo-1610832958506-aa56368176cf?auto=format&fit=crop&q=80&w=400" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="ถั่วงอก 5 กก.">
-                                        <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+                                    <div class="relative h-48 md:h-40 overflow-hidden bg-slate-100">
+                                        <!-- รูปสินค้า ถุงกลาง -->
+                                        <img src="https://raw.githubusercontent.com/xtann39-ux/farmai/main/product.jpg" 
+                                             onerror="this.src='./product.jpg'"
+                                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="ถั่วงอก 5 กก.">
+                                        <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
                                         <div class="absolute bottom-2 left-3 text-white font-bold text-sm">แพ็คครอบครัว</div>
                                     </div>
                                     <div class="p-4 flex flex-col flex-1 justify-center text-center">
@@ -139,10 +142,12 @@
                             <label class="relative cursor-pointer group">
                                 <input type="radio" name="sproutSize" value="10" class="peer sr-only">
                                 <div class="rounded-2xl border-2 border-slate-100 bg-white overflow-hidden peer-checked:border-[#00b900] peer-checked:bg-green-50/20 transition-all shadow-sm group-hover:shadow-md h-full flex flex-col relative">
-                                    <!-- เปลี่ยนรูปสินค้า 10 กก. ได้ที่นี่ -->
-                                    <div class="relative h-40 overflow-hidden bg-slate-100">
-                                        <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=400" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="ถั่วงอก 10 กก.">
-                                        <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+                                    <div class="relative h-48 md:h-40 overflow-hidden bg-slate-100">
+                                        <!-- รูปสินค้า ถุงใหญ่ -->
+                                        <img src="https://raw.githubusercontent.com/xtann39-ux/farmai/main/product.jpg" 
+                                             onerror="this.src='./product.jpg'"
+                                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="ถั่วงอก 10 กก.">
+                                        <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
                                         <div class="absolute bottom-2 left-3 text-white font-bold text-sm">แพ็คราคาส่ง</div>
                                     </div>
                                     <div class="p-4 flex flex-col flex-1 justify-center text-center">
@@ -361,7 +366,7 @@
         </div>
     </div>
 
-    <!-- Firebase Scripts (เหมือนเดิม) -->
+    <!-- Firebase Scripts -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
