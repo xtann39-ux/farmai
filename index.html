@@ -68,7 +68,6 @@
                         </h2>
                         
                         <div class="grid grid-cols-3 gap-3">
-                            <!-- 1 กก. -->
                             <label class="cursor-pointer relative group">
                                 <input type="radio" name="sproutSize" value="1" class="peer hidden" required>
                                 <div class="h-full border-2 border-gray-200 rounded-xl p-3 flex flex-col items-center text-center transition-all peer-checked:border-green-500 peer-checked:bg-green-50">
@@ -76,7 +75,6 @@
                                     <span class="font-bold text-gray-800 peer-checked:text-green-700">1 กก.</span>
                                 </div>
                             </label>
-                            <!-- 2 กก. -->
                             <label class="cursor-pointer relative group">
                                 <input type="radio" name="sproutSize" value="2" class="peer hidden">
                                 <div class="h-full border-2 border-gray-200 rounded-xl p-3 flex flex-col items-center text-center transition-all peer-checked:border-green-500 peer-checked:bg-green-50">
@@ -84,7 +82,6 @@
                                     <span class="font-bold text-gray-800 peer-checked:text-green-700">2 กก.</span>
                                 </div>
                             </label>
-                            <!-- 5 กก. -->
                             <label class="cursor-pointer relative group">
                                 <input type="radio" name="sproutSize" value="5" class="peer hidden">
                                 <div class="h-full border-2 border-gray-200 rounded-xl p-3 flex flex-col items-center text-center transition-all peer-checked:border-green-500 peer-checked:bg-green-50">
@@ -105,7 +102,7 @@
                         </div>
                     </div>
 
-                    <!-- ส่วนที่ 2: วันที่ต้องการรับสินค้า (อัปเดตใหม่ ✨) -->
+                    <!-- ส่วนที่ 2: วันที่ต้องการรับสินค้า -->
                     <div class="mb-8 bg-gray-50 p-5 rounded-2xl border border-gray-100">
                         <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
                             <span class="bg-blue-100 text-blue-700 w-8 h-8 rounded-full flex items-center justify-center text-sm">2</span> 
@@ -113,7 +110,6 @@
                         </h2>
                         
                         <div class="flex flex-col md:flex-row gap-4">
-                            <!-- รับวันนี้ -->
                             <label class="flex-1 cursor-pointer relative">
                                 <input type="radio" name="receiveDateType" value="today" class="peer hidden" checked onchange="toggleDatePicker()">
                                 <div class="border-2 border-gray-200 rounded-xl p-4 text-center transition-all peer-checked:border-blue-500 peer-checked:bg-blue-50">
@@ -121,7 +117,6 @@
                                     <div class="text-sm text-gray-500 mt-1">ผลิตและจัดส่งรอบวันนี้</div>
                                 </div>
                             </label>
-                            <!-- กำหนดวัน -->
                             <label class="flex-1 cursor-pointer relative">
                                 <input type="radio" name="receiveDateType" value="custom" class="peer hidden" onchange="toggleDatePicker()">
                                 <div class="border-2 border-gray-200 rounded-xl p-4 text-center transition-all peer-checked:border-blue-500 peer-checked:bg-blue-50">
@@ -131,7 +126,6 @@
                             </label>
                         </div>
 
-                        <!-- ปฏิทิน (จะโชว์เมื่อเลือก "กำหนดวันที่") -->
                         <div id="datePickerContainer" class="mt-4 hidden animate-[fadeIn_0.2s_ease-in-out]">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">เลือกวันที่ต้องการรับของ:</label>
                             <input type="date" id="customDateInput" name="customDate" 
@@ -143,7 +137,7 @@
                     <div class="mb-8">
                         <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
                             <span class="bg-orange-100 text-orange-700 w-8 h-8 rounded-full flex items-center justify-center text-sm">3</span> 
-                            ข้อมูลลูกค้า
+                            ข้อมูลลูกค้าจัดส่ง
                         </h2>
                         <div class="space-y-4">
                             <div>
@@ -152,7 +146,27 @@
                             <div>
                                 <textarea name="deliveryAddress" placeholder="ที่อยู่จัดส่งโดยละเอียด..." rows="3" required class="w-full p-4 border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-green-500 outline-none"></textarea>
                             </div>
+                            <div>
+                                <input type="text" name="gpsLink" placeholder="วางลิงก์ Google Maps พิกัดบ้าน/ร้านคุณ (ถ้ามี)" class="w-full p-4 border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-green-500 outline-none">
+                                <p class="text-xs text-gray-400 mt-1 ml-2">*ช่วยให้ไรเดอร์ของเราไปส่งได้แม่นยำและรวดเร็วขึ้นครับ</p>
+                            </div>
                         </div>
+                    </div>
+
+                    <!-- ส่วนที่ 4: แผนที่ร้าน / พิกัดฟาร์ม (กลับมาแล้ว!) -->
+                    <div class="mb-8 bg-gray-50 p-5 rounded-2xl border border-gray-100">
+                        <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                            <span class="bg-purple-100 text-purple-700 w-8 h-8 rounded-full flex items-center justify-center text-sm">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path></svg>
+                            </span> 
+                            พิกัดส่งของ
+                        </h2>
+                        <!-- กล่องแผนที่ Google Maps -->
+                        <div class="w-full h-48 md:h-64 rounded-xl overflow-hidden border border-gray-200 shadow-inner">
+                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15502.5855799971!2d100.51869824999999!3d13.73976375!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30e299292db21c51%3A0xe2125ce01db320de!2sBangkok!5e0!3m2!1sen!2sth!4v1700000000000!5m2!1sen!2sth" 
+                                    width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                        </div>
+                        <p class="text-sm text-gray-500 mt-3 text-center">ลูกค้าสามารถมารับเองที่ฟาร์มได้ตามแผนที่นี้เลยครับ</p>
                     </div>
 
                     <!-- ปุ่มยืนยัน -->
@@ -213,9 +227,9 @@
         // ----------------------------------------------------
         // ตั้งค่า LINE ID ของคุณตรงนี้!
         // ----------------------------------------------------
-        const YOUR_LINE_ID = "@yourlineid"; // เปลี่ยนเป็น LINE OA หรือ LINE ส่วนตัวของคุณ
+        const YOUR_LINE_ID = "@yourlineid"; 
         
-        const STORAGE_KEY = 'sprout_orders_v2';
+        const STORAGE_KEY = 'sprout_orders_v3';
 
         // ตั้งค่าปฏิทินให้เลือกได้ตั้งแต่วันพรุ่งนี้เป็นต้นไป
         window.addEventListener('load', () => {
@@ -244,7 +258,6 @@
             if(tabId === 'admin-page') refreshOrders();
         }
 
-        // ปรับลดจำนวน
         function adjustQty(change) {
             const input = document.getElementById('qtyInput');
             let val = parseInt(input.value) + change;
@@ -252,7 +265,6 @@
             input.value = val;
         }
 
-        // เปิด/ปิด ช่องเลือกวันที่
         function toggleDatePicker() {
             const isCustom = document.querySelector('input[name="receiveDateType"]:checked').value === 'custom';
             const container = document.getElementById('datePickerContainer');
@@ -264,11 +276,11 @@
             } else {
                 container.classList.add('hidden');
                 input.required = false;
-                input.value = ''; // เคลียร์ค่า
+                input.value = ''; 
             }
         }
 
-        // จัดการเมื่อกดปุ่ม "ยืนยันสั่งซื้อ"
+        // จัดการส่งออเดอร์
         function handleOrderSubmit(event) {
             event.preventDefault();
             const form = event.target;
@@ -278,14 +290,13 @@
             const qty = parseInt(formData.get('sproutQuantity'));
             const name = formData.get('customerName').trim();
             const address = formData.get('deliveryAddress').trim();
+            const gpsLink = formData.get('gpsLink').trim(); // ดึงค่าลิงก์ GPS ที่ลูกค้ากรอก
             
-            // ตรวจสอบวันที่รับของ
             const dateType = formData.get('receiveDateType');
             let receiveDateText = "รับทันที (วันนี้)";
             
             if (dateType === 'custom') {
                 const rawDate = formData.get('customDate');
-                // แปลงรูปแบบวันที่ YYYY-MM-DD เป็น DD/MM/YYYY
                 const [year, month, day] = rawDate.split('-');
                 receiveDateText = `วันที่ ${day}/${month}/${year}`;
             }
@@ -298,39 +309,37 @@
                 quantity: qty,
                 totalWeight: size * qty,
                 address: address,
-                receiveDate: receiveDateText, // บันทึกวันที่ต้องการรับ
+                gpsLink: gpsLink,
+                receiveDate: receiveDateText,
                 status: 'received'
             };
 
-            // 1. บันทึกลงระบบหลังบ้าน (localStorage)
+            // บันทึกลงระบบหลังบ้าน
             const orders = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
             orders.push(order);
             localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
 
-            // 2. สร้างข้อความส่งเข้า LINE
+            // สร้างข้อความส่งเข้า LINE (เพิ่มลิงก์พิกัดไปด้วย)
             const lineMessage = `🛒 มีคำสั่งซื้อถั่วงอกใหม่!\n`
                               + `👤 ชื่อ: ${name}\n`
                               + `📅 วันที่รับของ: ${receiveDateText}\n`
                               + `📦 รายการ: ขนาด ${size} กก. จำนวน ${qty} ถุง\n`
                               + `⚖️ น้ำหนักรวม: ${order.totalWeight} กก.\n`
-                              + `📍 ที่อยู่จัดส่ง:\n${address}`;
+                              + `📍 ที่อยู่จัดส่ง:\n${address}\n`
+                              + `🗺 พิกัด GPS: ${gpsLink ? gpsLink : 'ไม่ระบุ'}`;
             
             const encodedMessage = encodeURIComponent(lineMessage);
             const lineUrl = `https://line.me/R/ti/p/~${YOUR_LINE_ID}?text=${encodedMessage}`;
 
-            // รีเซ็ตฟอร์ม
             form.reset();
             document.getElementById('datePickerContainer').classList.add('hidden');
             document.getElementById('customDateInput').required = false;
 
-            // 3. พาผู้ใช้เด้งไปที่ LINE
             window.open(lineUrl, '_blank');
-            
-            // แจ้งเตือนหน้าเว็บ (เผื่อลูกค้าบล็อกป๊อปอัป)
             alert('บันทึกคำสั่งซื้อเรียบร้อย! ระบบกำลังพาท่านไปที่ LINE เพื่อยืนยันกับร้านค้า');
         }
 
-        // --- ระบบหลังบ้านและติดตาม (ฟังก์ชันเหมือนเดิม เพิ่มแค่ช่องวันที่) ---
+        // ระบบหลังบ้าน
         function refreshOrders() {
             const tableBody = document.getElementById('ordersTableBody');
             const orders = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
@@ -353,6 +362,7 @@
                     <td class="p-3">
                         <div>${order.size} กก. x ${order.quantity} ถุง</div>
                         <div class="text-xs text-gray-500 font-bold mt-1">รวม: ${order.totalWeight} กก.</div>
+                        ${order.gpsLink ? `<a href="${order.gpsLink}" target="_blank" class="text-xs text-blue-500 hover:underline mt-1 block">📍 ดูแผนที่จัดส่ง</a>` : ''}
                     </td>
                     <td class="p-3">
                         <select onchange="updateStatus(${order.id}, this.value)" class="bg-gray-50 border rounded p-1 text-sm outline-none">
@@ -406,11 +416,10 @@
             if(found.length === 0) {
                 resultDiv.innerHTML = `<div class="text-red-500 text-center">ไม่พบข้อมูลของชื่อนี้</div>`;
             } else {
-                // เอาออเดอร์ล่าสุด
                 const latest = found[found.length - 1];
                 const statusMap = {
                     'received': '📥 ทางร้านได้รับคำสั่งซื้อแล้ว',
-                    'producing': '🌱 กำลังทำการเพาะปลูก/บรรจุ',
+                    'producing': '🌱 กำลังบรรจุ',
                     'delivering': '🚚 กำลังเดินทางไปส่งให้คุณ',
                     'delivered': '✅ จัดส่งถึงมือเรียบร้อยแล้ว'
                 };
